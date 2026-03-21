@@ -1,0 +1,256 @@
+.controls {
+  padding: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 2;
+}
+
+/* ══════════════════════════════
+   ROW 1 — Game mode tabs
+   Underline grows from centre on hover (matches nav style)
+══════════════════════════════ */
+.modeTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.modeTab {
+  position: relative;
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 14px 32px;
+  text-align: center;
+  transition: color 0.2s;
+  outline: none;
+}
+
+/* Underline: starts at centre (left:50%, right:50%), expands to full on hover/active */
+.modeTab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  right: 50%;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(232, 255, 71, 0.5);
+  transition: left 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              right 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modeTab:hover {
+  color: var(--text);
+}
+
+.modeTab:hover::after {
+  left: 0;
+  right: 0;
+}
+
+.modeTab.modeTabActive {
+  color: var(--accent);
+}
+
+.modeTab.modeTabActive::after {
+  left: 0;
+  right: 0;
+}
+
+/* ══════════════════════════════
+   ROW 2 — Filter row
+══════════════════════════════ */
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filterLabel {
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.buttonSet {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+}
+
+/* Filter buttons — enlarged, solid fill hover, text stays visible via z-index */
+.filterBtn {
+  position: relative;
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--card-border);
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: color 0.15s;
+  outline: none;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.filterBtn:last-child {
+  border-right: none;
+}
+
+/* Solid accent fill slides up from bottom */
+.filterBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+}
+
+.filterBtn:hover::before {
+  transform: translateY(0);
+}
+
+/* Text label sits above the fill */
+.btnLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.filterBtn:hover {
+  color: var(--bg);
+}
+
+/* Active: always solid fill */
+.filterBtn.filterBtnActive {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: var(--card-border);
+  margin: 0 24px;
+  flex-shrink: 0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ══════════════════════════════
+   Advanced stats button
+══════════════════════════════ */
+.advancedBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(0, 212, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  overflow: hidden;
+}
+
+/* Left-to-right semi-opaque fill on hover */
+.advancedBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 212, 255, 0.1);
+  transform: translateX(-101%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+}
+
+.advancedBtn:hover::before { transform: translateX(0); }
+
+/* Keep all child content above the fill */
+.advancedBtn > * { position: relative; z-index: 1; }
+
+.advancedBtn:hover {
+  color: var(--accent3);
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.06);
+}
+
+.advancedBtn.advancedActive {
+  color: var(--accent3);
+  border-color: rgba(0, 212, 255, 0.45);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.08);
+}
+
+.advancedBtn.advancedActive .activeDot {
+  opacity: 1;
+}
+
+.barsIcon {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.barsIcon span {
+  width: 3px;
+  background: currentColor;
+  display: block;
+}
+
+.activeDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent3);
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 0 4px rgba(0, 212, 255, 0.3);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .controls { padding: 20px 32px; }
+  .filterRow { row-gap: 12px; flex-wrap: wrap; }
+  .divider { display: none; }
+  .spacer { width: 100%; flex-basis: 100%; }
+}

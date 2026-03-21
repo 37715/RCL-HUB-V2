@@ -1,0 +1,170 @@
+.page {
+  position: relative;
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 80px 64px 0;
+  position: relative;
+  overflow: hidden;
+  animation: heroReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+.heroInner {
+  display: flex;
+  align-items: flex-end;       /* season badge pins to bottom-right, matching original */
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 40px;
+}
+
+.heroLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.eyebrowLine {
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.eyebrowText {
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* Title — outer div sets font + background gradient for line 1 */
+.heroTitle {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 10vw, 140px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+}
+
+/* Line 1 — gradient white fill (matches original) */
+.heroLine1 {
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Line 2 — outlined with yellow-tinted stroke (matches original span style) */
+.heroLine2 {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(232, 255, 71, 0.4);
+}
+
+/* ── Hero right (season badge) ── */
+.heroRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.seasonBadge {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(232, 255, 71, 0.35);
+}
+
+.activePlayers {
+  font-family: var(--font-mono), 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ── Table section ── */
+.tableSection {
+  padding: 0 64px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Panel backdrop ── */
+.comingSoon {
+  padding: 120px 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.comingSoonLabel {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 72px;
+  letter-spacing: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.comingSoonSub {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.loadingState,
+.errorState {
+  padding: 80px 64px;
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+
+.errorState {
+  color: #ff3d6e;
+}
+
+.panelBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 199;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .hero { padding: 60px 40px 0; }
+  .heroInner { padding-bottom: 32px; }
+  .tableSection { padding: 0 40px 60px; }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 48px 20px 0; }
+  .heroInner { flex-direction: column; align-items: flex-start; padding-bottom: 24px; }
+  .heroRight { align-items: flex-start; }
+  .tableSection { padding: 0 20px 60px; }
+}

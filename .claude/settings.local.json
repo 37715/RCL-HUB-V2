@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r \"D:/ai and coding/newleaderboard/assets/mazes\" \"D:/ai and coding/newleaderboard/public/assets/\")",
+      "Bash(cp -r \"D:/ai and coding/newleaderboard/assets/ranks\" \"D:/ai and coding/newleaderboard/public/assets/\")",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "Bash(find 'D:\\\\ai and coding\\\\newleaderboard' -type f \\\\\\(-name *auth* -o -name *login* -o -name *user* -o -name *settings* \\\\\\) ! -path */node_modules/* ! -path */.next/*)",
+      "Bash(grep -r \"localStorage\\\\|sessionStorage\\\\|IndexedDB\\\\|useContext\\\\|createContext\\\\|Provider\" 'D:\\\\ai and coding\\\\newleaderboard\\\\src' --include=*.ts --include=*.tsx)"
+    ]
+  }
+}

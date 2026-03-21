@@ -1,0 +1,145 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(6, 6, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  animation: navSlide 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Brand: text-only "RCL" ── */
+.brand {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(232, 255, 71, 0.45);
+  text-decoration: none;
+  padding: 0 32px;
+  border-right: 1px solid var(--line);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: text-shadow 0.2s;
+}
+
+.brand:hover {
+  text-shadow: 0 0 36px rgba(232, 255, 71, 0.7);
+}
+
+/* ── Links — left-aligned, natural flow after brand ── */
+.links {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
+.link {
+  position: relative;
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--line);
+  transition: color 0.2s;
+  overflow: hidden;
+}
+
+/* Underline that grows from centre on hover/active */
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(232, 255, 71, 0.6);
+  transition: left 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              right 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.link:hover::after {
+  left: 0;
+  right: 0;
+}
+
+.link.active {
+  color: var(--accent);
+}
+
+.link.active::after {
+  left: 0;
+  right: 0;
+}
+
+/* ── Menu button — pushed to far right ── */
+.menuBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 0 28px;
+  height: 100%;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--line);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.menuBtn:hover {
+  background: rgba(232, 255, 71, 0.04);
+}
+
+.menuBtnLabel {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(232, 255, 71, 0.4);
+  transition: text-shadow 0.2s;
+}
+
+.menuBtn:hover .menuBtnLabel {
+  text-shadow: 0 0 32px rgba(232, 255, 71, 0.7);
+}
+
+.menuBtnIcon {
+  font-family: var(--font-mono), monospace;
+  font-size: 18px;
+  color: var(--accent);
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s;
+  line-height: 1;
+  width: 14px;
+  text-align: center;
+}
+
+.menuBtnOpen .menuBtnIcon {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .brand { padding: 0 20px; font-size: 22px; }
+  .link { padding: 0 16px; font-size: 11px; letter-spacing: 2px; }
+  .menuBtn { padding: 0 20px; }
+}

@@ -1,0 +1,75 @@
+.wrap { position: relative; }
+
+/* Header — exact same grid as entry rows */
+.header {
+  display: grid;
+  grid-template-columns: 72px 1fr 110px 90px 110px 130px 200px 140px;
+  align-items: center;
+  height: 40px;
+  border-bottom: 1px solid var(--line);
+  animation: headerFadeIn 0.2s ease both;
+}
+
+@keyframes headerFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.th {
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.thRank { padding-left: 8px; }
+.thLast { justify-content: flex-start; padding-left: 8px; }
+
+.thSortable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.thSortable:hover { color: var(--text); }
+
+.thActive { color: var(--accent); }
+.thActive:hover { color: var(--accent); }
+
+.sortIcon {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+/* Scanline sweep on mode change */
+.scanline {
+  position: absolute;
+  inset-x: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.5;
+  animation: scanDown 0.45s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes scanDown {
+  from { top: 0; opacity: 0.6; }
+  to   { top: 100%; opacity: 0; }
+}
+
+@media (max-width: 1280px) {
+  .header { grid-template-columns: 60px 1fr 100px 80px 100px 120px 180px 120px; }
+}
+
+@media (max-width: 1024px) {
+  .header { grid-template-columns: 56px 1fr 90px 80px 0px 110px 160px 110px; }
+  .header .th:nth-child(5) { display: none; }
+}

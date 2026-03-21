@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAZING — LEADERBOARD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06060a;
+  --bg2: #0a0a12;
+  --line: rgba(255,255,255,0.06);
+  --accent: #e8ff47;
+  --accent2: #ff3d6e;
+  --accent3: #00d4ff;
+  --text: #f0f0f0;
+  --muted: rgba(240,240,240,0.35);
+  --card: rgba(255,255,255,0.028);
+  --card-border: rgba(255,255,255,0.07);
+  --bronze: #cd7f32;
+  --silver: #a8b8c8;
+  --gold: #ffd700;
+  --platinum: #44d4c0;
+  --diamond: #7eb4ea;
+  --master: #9b59b6;
+  --grandmaster: #e74c3c;
+  --legendary: #f39c12;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* GRID OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(232,255,71,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,255,71,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* DIAGONAL ACCENT LINES */
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  right: -20%;
+  width: 80vw;
+  height: 200vh;
+  background: linear-gradient(135deg, transparent 48%, rgba(232,255,71,0.018) 49%, rgba(232,255,71,0.018) 51%, transparent 52%);
+  background-size: 120px 120px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* AMBIENT GLOW */
+.ambient {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.ambient-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(232,255,71,0.04) 0%, transparent 70%);
+  top: -200px; right: -100px;
+  animation: ambientDrift1 20s ease-in-out infinite alternate;
+}
+.ambient-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%);
+  bottom: 0; left: -100px;
+  animation: ambientDrift2 25s ease-in-out infinite alternate;
+}
+.ambient-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,61,110,0.03) 0%, transparent 70%);
+  top: 50%; left: 40%;
+  animation: ambientDrift3 18s ease-in-out infinite alternate;
+}
+
+@keyframes ambientDrift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(-80px, 60px) scale(1.2); } }
+@keyframes ambientDrift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(60px, -80px) scale(1.15); } }
+@keyframes ambientDrift3 { from { transform: translate(0,0); } to { transform: translate(-40px, 40px); } }
+
+/* ═══ NAV ═══ */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  height: 64px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(6,6,10,0.92);
+  backdrop-filter: blur(20px);
+  animation: navSlide 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes navSlide { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  border-right: 1px solid var(--line);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(232,255,71,0.4);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nav-logo-mark {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--accent);
+  transform: rotate(45deg);
+  position: relative;
+  flex-shrink: 0;
+  animation: spinMark 8s linear infinite;
+}
+
+.nav-logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: var(--accent);
+  transform: rotate(0deg);
+}
+
+@keyframes spinMark { from { transform: rotate(45deg); } to { transform: rotate(405deg); } }
+
+.nav-links {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-right: 1px solid var(--line);
+  transition: color 0.2s, background 0.2s;
+  position: relative;
+  text-decoration: none;
+  user-select: none;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.nav-link:hover::after { transform: scaleX(1); }
+.nav-link.active { color: var(--accent); }
+.nav-link.active::after { transform: scaleX(1); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4eff91;
+  box-shadow: 0 0 8px #4eff91;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 80px 64px 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 40px;
+  animation: heroReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+}
+
+@keyframes heroReveal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 10vw, 140px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-title span {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(232,255,71,0.4);
+  background: none;
+}
+
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.hero-season-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(232,255,71,0.3);
+}
+
+.hero-player-count {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ═══ CONTROLS ═══ */
+.controls {
+  position: relative;
+  z-index: 1;
+  padding: 40px 64px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-top: 40px;
+  animation: heroReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+}
+
+.control-group {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--card-border);
+}
+
+.control-label {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-right: 1px solid var(--card-border);
+  white-space: nowrap;
+  background: rgba(255,255,255,0.015);
+}
+
+.control-btn {
+  padding: 12px 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+
+.control-btn span { position: relative; z-index: 1; }
+
+.control-btn:hover { color: var(--bg); }
+.control-btn:hover::before { transform: translateY(0); }
+.control-btn.active { color: var(--bg); background: var(--accent); }
+.control-btn.active::before { transform: translateY(0); }
+
+.controls-divider {
+  width: 32px;
+  height: 1px;
+  background: var(--line);
+  margin: 0 24px;
+}
+
+.advanced-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent3);
+  background: transparent;
+  border: 1px solid rgba(0,212,255,0.3);
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.advanced-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,212,255,0.08);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+
+.advanced-btn:hover::after { transform: scaleX(1); }
+.advanced-btn:hover { border-color: var(--accent3); box-shadow: 0 0 20px rgba(0,212,255,0.15); }
+
+.adv-icon {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+.adv-icon span {
+  display: block;
+  background: var(--accent3);
+  opacity: 0.7;
+}
+.adv-icon span:nth-child(1) { height: 100%; }
+.adv-icon span:nth-child(2) { height: 60%; align-self: end; }
+.adv-icon span:nth-child(3) { height: 80%; align-self: end; }
+.adv-icon span:nth-child(4) { height: 100%; }
+
+/* ═══ TABLE HEADER ═══ */
+.table-header {
+  position: relative;
+  z-index: 1;
+  padding: 0 64px;
+  display: grid;
+  grid-template-columns: 72px 1fr 100px 90px 100px 120px 200px 130px;
+  gap: 0 24px;
+  align-items: center;
+  height: 40px;
+  border-bottom: 1px solid var(--line);
+  animation: heroReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.45s both;
+}
+
+.th {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.th.sortable { cursor: pointer; transition: color 0.2s; }
+.th.sortable:hover { color: var(--accent); }
+
+.th-sort {
+  width: 8px;
+  height: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0.5;
+}
+.th-sort::before, .th-sort::after {
+  content: '';
+  display: block;
+  width: 0;
+  border-style: solid;
+}
+.th-sort::before { border-width: 0 4px 4px; border-color: transparent transparent currentColor; }
+.th-sort::after { border-width: 4px 4px 0; border-color: currentColor transparent transparent; }
+
+/* ═══ LEADERBOARD ENTRIES ═══ */
+.leaderboard {
+  position: relative;
+  z-index: 1;
+  padding: 0 64px 80px;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 72px 1fr 100px 90px 100px 120px 200px 130px;
+  gap: 0 24px;
+  align-items: center;
+  min-height: 72px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: entryReveal 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes entryReveal {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.entry::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--accent);
+  opacity: 0.06;
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+
+.entry:hover::before { width: 100%; }
+
+.entry:hover .entry-username { color: var(--accent); }
+
+/* Top 3 special treatment */
+.entry[data-rank="1"] { background: linear-gradient(90deg, rgba(255,215,0,0.04) 0%, transparent 60%); }
+.entry[data-rank="2"] { background: linear-gradient(90deg, rgba(168,184,200,0.03) 0%, transparent 60%); }
+.entry[data-rank="3"] { background: linear-gradient(90deg, rgba(205,127,50,0.03) 0%, transparent 60%); }
+
+.entry[data-rank="1"] .entry-rank-num { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+.entry[data-rank="2"] .entry-rank-num { color: #a8b8c8; }
+.entry[data-rank="3"] .entry-rank-num { color: #cd7f32; }
+
+/* RANK POSITION */
+.entry-rank {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 4px;
+}
+
+.entry-rank-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: rgba(255,255,255,0.15);
+  line-height: 1;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+
+/* PLAYER */
+.entry-player {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.entry-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.entry-info { display: flex; flex-direction: column; gap: 3px; }
+
+.entry-username {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+
+.entry-tag {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ELO */
+.entry-elo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+
+/* KD */
+.entry-kd {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* LAST ACTIVE */
+.entry-active {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* MATCHES */
+.entry-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.matches-count {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.matches-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 1px;
+  overflow: hidden;
+  gap: 1px;
+  width: 100%;
+}
+
+.bar-seg {
+  height: 100%;
+  border-radius: 1px;
+  transition: opacity 0.2s;
+}
+.bar-seg:hover { opacity: 0.8; }
+.bar-win { background: #4eff91; }
+.bar-2nd { background: #ffe94e; }
+.bar-3rd { background: #ff9a3c; }
+.bar-loss { background: #ff3d6e; }
+
+/* RANK TIER */
+.entry-tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tier-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.tier-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tier-bronze { color: var(--bronze); }
+.tier-silver { color: var(--silver); }
+.tier-gold { color: var(--gold); }
+.tier-platinum { color: var(--platinum); }
+.tier-diamond { color: var(--diamond); }
+.tier-master { color: var(--master); }
+.tier-grandmaster { color: var(--grandmaster); }
+.tier-legendary { color: var(--legendary); }
+
+/* ═══ ADVANCED STATS PANEL ═══ */
+.advanced-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 400px;
+  z-index: 200;
+  background: rgba(6,6,10,0.97);
+  border-left: 1px solid var(--line);
+  backdrop-filter: blur(30px);
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.advanced-panel.open { transform: translateX(0); }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 3px;
+  color: var(--accent3);
+}
+
+.panel-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.panel-close:hover { border-color: var(--accent2); color: var(--accent2); }
+
+.stat-block {
+  margin-bottom: 32px;
+}
+
+.stat-block-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.stat-row-label { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+.stat-row-value { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
+
+.stat-bar-wrap {
+  margin-top: 8px;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  background: var(--accent3);
+  border-radius: 2px;
+  animation: statBarGrow 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes statBarGrow { from { width: 0; } }
+
+/* ═══ GEOMETRIC DECORATION ═══ */
+.geo-deco {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.geo-circle {
+  border-radius: 50%;
+  border: 1px solid rgba(232,255,71,0.06);
+  animation: geoRotate 30s linear infinite;
+}
+
+.geo-1 {
+  width: 300px; height: 300px;
+  bottom: 10%; right: 5%;
+  border-color: rgba(0,212,255,0.05);
+}
+
+.geo-2 {
+  width: 180px; height: 180px;
+  bottom: 15%; right: 10%;
+  border-color: rgba(232,255,71,0.08);
+  animation-direction: reverse;
+  animation-duration: 20s;
+}
+
+@keyframes geoRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.geo-line {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent, rgba(232,255,71,0.06), transparent);
+  height: 1px;
+  width: 100vw;
+  animation: lineSlide 8s ease-in-out infinite;
+}
+
+.geo-line-1 { top: 30%; animation-delay: 0s; }
+.geo-line-2 { top: 65%; animation-delay: 4s; }
+
+@keyframes lineSlide {
+  0%,100% { opacity: 0; transform: translateX(-100%); }
+  50% { opacity: 1; transform: translateX(100%); }
+}
+
+/* ═══ TICKER ═══ */
+.ticker {
+  position: relative;
+  z-index: 1;
+  height: 32px;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: rgba(232,255,71,0.02);
+}
+
+.ticker-track {
+  display: flex;
+  gap: 0;
+  animation: tickerScroll 40s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 32px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-right: 1px solid var(--line);
+}
+
+.ticker-item strong { color: var(--accent); font-weight: 700; }
+.ticker-item .up { color: #4eff91; }
+.ticker-item .down { color: var(--accent2); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .table-header,
+  .entry {
+    grid-template-columns: 60px 1fr 90px 80px 90px 100px 160px 110px;
+    gap: 0 16px;
+  }
+  .hero { padding: 60px 40px 0; }
+  .controls { padding: 32px 40px; }
+  .table-header { padding: 0 40px; }
+  .leaderboard { padding: 0 40px 80px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient lighting -->
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+<div class="ambient ambient-3"></div>
+
+<!-- Geometric decorations -->
+<div class="geo-deco geo-circle geo-1"></div>
+<div class="geo-deco geo-circle geo-2"></div>
+<div class="geo-line geo-line-1"></div>
+<div class="geo-line geo-line-2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark"></div>
+    MAZING
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" href="#"><span>Leaderboard</span></a>
+    <a class="nav-link" href="#"><span>Tutorials</span></a>
+    <a class="nav-link" href="#"><span>Mazing</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span>LIVE</span>
+    </div>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">Global Rankings</div>
+    <div class="hero-title">LEADER<br><span>BOARD</span></div>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-season-badge" id="heroSeasonBadge">S4 2026</div>
+    <div class="hero-player-count" id="heroPlayerCount">4,827 ACTIVE PLAYERS</div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <!-- Season -->
+  <div class="control-group" id="seasonGroup">
+    <div class="control-label">Season</div>
+    <button class="control-btn" data-season="1" onclick="setSeason(1)"><span>S1 2023</span></button>
+    <button class="control-btn" data-season="2" onclick="setSeason(2)"><span>S2 2024</span></button>
+    <button class="control-btn" data-season="3" onclick="setSeason(3)"><span>S3 2025</span></button>
+    <button class="control-btn active" data-season="4" onclick="setSeason(4)"><span>S4 2026</span></button>
+  </div>
+
+  <div class="controls-divider"></div>
+
+  <!-- Region -->
+  <div class="control-group" id="regionGroup">
+    <div class="control-label">Region</div>
+    <button class="control-btn" data-region="eu" onclick="setRegion('eu')"><span>EU</span></button>
+    <button class="control-btn" data-region="na" onclick="setRegion('na')"><span>NA</span></button>
+    <button class="control-btn active" data-region="combined" onclick="setRegion('combined')"><span>Combined</span></button>
+  </div>
+
+  <button class="advanced-btn" onclick="toggleAdvanced()">
+    <div class="adv-icon">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <span>Advanced Stats</span>
+  </button>
+</div>
+
+<!-- TABLE HEADER -->
+<div class="table-header">
+  <div class="th">#</div>
+  <div class="th">Player</div>
+  <div class="th sortable">ELO <div class="th-sort"></div></div>
+  <div class="th sortable">K/D <div class="th-sort"></div></div>
+  <div class="th">Last Active</div>
+  <div class="th sortable">Matches <div class="th-sort"></div></div>
+  <div class="th">Win Distribution</div>
+  <div class="th">Rank</div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="leaderboard" id="leaderboard"></div>
+
+<!-- ADVANCED PANEL -->
+<div class="advanced-panel" id="advPanel">
+  <div class="panel-header">
+    <div class="panel-title">Advanced Stats</div>
+    <button class="panel-close" onclick="toggleAdvanced()">✕</button>
+  </div>
+  <div id="advContent"></div>
+</div>
+
+<script>
+const TIERS = ['bronze','silver','gold','platinum','diamond','master','grandmaster','legendary'];
+const TIER_LABELS = ['Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Legendary'];
+
+const PLAYERS = [
+  { name:'VoidStrike',   tag:'#7291', elo:3847, kd:4.21, lastActive:'2h ago',   matches:312, wins:189, second:58, third:32, losses:33, tier:'legendary',    region:'eu' },
+  { name:'NxT_Spectre',  tag:'#0042', elo:3712, kd:3.87, lastActive:'5h ago',   matches:280, wins:168, second:52, third:28, losses:32, tier:'legendary',    region:'na' },
+  { name:'Elara.X',      tag:'#1337', elo:3601, kd:3.54, lastActive:'1d ago',   matches:298, wins:155, second:61, third:41, losses:41, tier:'grandmaster',  region:'eu' },
+  { name:'KairosFrag',   tag:'#8820', elo:3490, kd:3.33, lastActive:'3h ago',   matches:264, wins:141, second:55, third:36, losses:32, tier:'grandmaster',  region:'na' },
+  { name:'LUMINARY',     tag:'#5500', elo:3388, kd:3.11, lastActive:'12h ago',  matches:311, wins:148, second:72, third:48, losses:43, tier:'grandmaster',  region:'eu' },
+  { name:'ph4ntom',      tag:'#9911', elo:3270, kd:2.98, lastActive:'6h ago',   matches:245, wins:127, second:53, third:35, losses:30, tier:'master',       region:'na' },
+  { name:'ZeroAxis',     tag:'#3344', elo:3188, kd:2.77, lastActive:'2d ago',   matches:289, wins:131, second:64, third:47, losses:47, tier:'master',       region:'eu' },
+  { name:'Cryogen_K',    tag:'#6621', elo:3055, kd:2.65, lastActive:'4h ago',   matches:201, wins:98,  second:44, third:31, losses:28, tier:'master',       region:'na' },
+  { name:'AstralDrift',  tag:'#2209', elo:2940, kd:2.44, lastActive:'8h ago',   matches:276, wins:119, second:67, third:51, losses:39, tier:'diamond',      region:'eu' },
+  { name:'Wraith_V',     tag:'#7730', elo:2871, kd:2.31, lastActive:'1d ago',   matches:233, wins:104, second:56, third:40, losses:33, tier:'diamond',      region:'na' },
+  { name:'Solstice',     tag:'#1190', elo:2790, kd:2.19, lastActive:'3h ago',   matches:258, wins:108, second:62, third:48, losses:40, tier:'diamond',      region:'eu' },
+  { name:'NanoRift',     tag:'#4455', elo:2688, kd:2.05, lastActive:'5h ago',   matches:219, wins:90,  second:55, third:42, losses:32, tier:'diamond',      region:'na' },
+  { name:'CipherX',      tag:'#8800', elo:2571, kd:1.94, lastActive:'1d ago',   matches:247, wins:94,  second:63, third:51, losses:39, tier:'platinum',     region:'eu' },
+  { name:'Erevan',       tag:'#3318', elo:2460, kd:1.82, lastActive:'2d ago',   matches:195, wins:78,  second:51, third:38, losses:28, tier:'platinum',     region:'na' },
+  { name:'PROXIMA',      tag:'#6642', elo:2355, kd:1.71, lastActive:'6h ago',   matches:223, wins:83,  second:58, third:45, losses:37, tier:'platinum',     region:'eu' },
+  { name:'krix.7',       tag:'#9933', elo:2240, kd:1.61, lastActive:'3d ago',   matches:188, wins:70,  second:48, third:38, losses:32, tier:'gold',         region:'na' },
+  { name:'Nebulon',      tag:'#1102', elo:2130, kd:1.52, lastActive:'4h ago',   matches:211, wins:74,  second:55, third:44, losses:38, tier:'gold',         region:'eu' },
+  { name:'FrostLine',    tag:'#5577', elo:2018, kd:1.43, lastActive:'1d ago',   matches:178, wins:61,  second:48, third:39, losses:30, tier:'gold',         region:'na' },
+  { name:'Talon.EXE',    tag:'#8821', elo:1905, kd:1.35, lastActive:'2d ago',   matches:165, wins:55,  second:44, third:37, losses:29, tier:'silver',       region:'eu' },
+  { name:'Yuki_dash',    tag:'#2244', elo:1790, kd:1.26, lastActive:'7h ago',   matches:152, wins:48,  second:41, third:34, losses:29, tier:'silver',       region:'na' },
+];
+
+let currentSeason = 4;
+let currentRegion = 'combined';
+let advOpen = false;
+
+function getTierClass(t) { return 'tier-' + t; }
+function getTierColor(t) {
+  const m = { bronze:'#cd7f32', silver:'#a8b8c8', gold:'#ffd700', platinum:'#44d4c0', diamond:'#7eb4ea', master:'#9b59b6', grandmaster:'#e74c3c', legendary:'#f39c12' };
+  return m[t] || '#fff';
+}
+
+function getAvatarColors(name) {
+  const hue = name.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 360;
+  return { bg: `hsl(${hue},40%,15%)`, text: `hsl(${hue},80%,70%)` };
+}
+
+function getEloColor(elo) {
+  if (elo >= 3500) return 'var(--legendary-color, #f39c12)';
+  if (elo >= 3000) return '#e74c3c';
+  if (elo >= 2500) return '#9b59b6';
+  if (elo >= 2000) return '#7eb4ea';
+  return 'var(--text)';
+}
+
+function getKDColor(kd) {
+  if (kd >= 4) return '#4eff91';
+  if (kd >= 3) return '#ffe94e';
+  if (kd >= 2) return '#ff9a3c';
+  return '#ff3d6e';
+}
+
+function renderLeaderboard() {
+  const lb = document.getElementById('leaderboard');
+  let filtered = PLAYERS;
+  if (currentRegion !== 'combined') filtered = PLAYERS.filter(p => p.region === currentRegion);
+
+  // Adjust ELO by season for realism
+  const seasonMult = [0.72, 0.83, 0.93, 1.0][currentSeason - 1];
+  filtered = filtered.map(p => ({ ...p, elo: Math.round(p.elo * seasonMult) }))
+    .sort((a, b) => b.elo - a.elo);
+
+  lb.innerHTML = filtered.map((p, i) => {
+    const rank = i + 1;
+    const total = p.matches;
+    const pWin = (p.wins / total * 100).toFixed(0);
+    const p2nd = (p.second / total * 100).toFixed(0);
+    const p3rd = (p.third / total * 100).toFixed(0);
+    const pLoss = (p.losses / total * 100).toFixed(0);
+    const av = getAvatarColors(p.name);
+    const eloColor = getEloColor(p.elo);
+    const kdColor = getKDColor(p.kd);
+    const tierColor = getTierColor(p.tier);
+    const initials = p.name.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
+    const delay = (i * 0.04).toFixed(2);
+
+    return `
+<div class="entry" data-rank="${rank}" data-idx="${i}" style="animation-delay:${delay}s" onclick="selectEntry(${i})">
+  <div class="entry-rank">
+    <div class="entry-rank-num">${rank}</div>
+  </div>
+  <div class="entry-player">
+    <div class="entry-avatar">
+      <div class="avatar-inner" style="background:${av.bg};color:${av.text}">${initials}</div>
+    </div>
+    <div class="entry-info">
+      <div class="entry-username">${p.name}</div>
+      <div class="entry-tag">${p.tag} · ${p.region.toUpperCase()}</div>
+    </div>
+  </div>
+  <div class="entry-elo" style="color:${eloColor}">${p.elo.toLocaleString()}</div>
+  <div class="entry-kd" style="color:${kdColor}">${p.kd.toFixed(2)}</div>
+  <div class="entry-active">${p.lastActive}</div>
+  <div class="entry-matches">
+    <div class="matches-count">${p.matches} matches</div>
+  </div>
+  <div class="entry-bar-col">
+    <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">${pWin}% WIN</div>
+    <div class="matches-bar">
+      <div class="bar-seg bar-win" style="width:${pWin}%" title="${p.wins} wins"></div>
+      <div class="bar-seg bar-2nd" style="width:${p2nd}%" title="${p.second} 2nd place"></div>
+      <div class="bar-seg bar-3rd" style="width:${p3rd}%" title="${p.third} 3rd place"></div>
+      <div class="bar-seg bar-loss" style="width:${pLoss}%" title="${p.losses} losses"></div>
+    </div>
+  </div>
+  <div class="entry-tier ${getTierClass(p.tier)}">
+    <div class="tier-pip" style="background:${tierColor};color:${tierColor}"></div>
+    <div class="tier-label">${TIER_LABELS[TIERS.indexOf(p.tier)]}</div>
+  </div>
+</div>`;
+  }).join('');
+
+  // Fix grid for bar col
+  document.querySelectorAll('.entry').forEach(el => {
+    el.style.gridTemplateColumns = '72px 1fr 100px 90px 100px 120px 200px 130px';
+  });
+}
+
+function setSeason(s) {
+  currentSeason = s;
+  document.querySelectorAll('#seasonGroup .control-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.season) === s);
+  });
+  const labels = ['S1 2023','S2 2024','S3 2025','S4 2026'];
+  document.getElementById('heroSeasonBadge').textContent = labels[s-1];
+  const counts = ['2,341','3,120','4,201','4,827'];
+  document.getElementById('heroPlayerCount').textContent = counts[s-1] + ' ACTIVE PLAYERS';
+  renderLeaderboard();
+}
+
+function setRegion(r) {
+  currentRegion = r;
+  document.querySelectorAll('#regionGroup .control-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.region === r);
+  });
+  renderLeaderboard();
+}
+
+function selectEntry(idx) {
+  const player = PLAYERS[idx];
+  if (!player) return;
+  const winRate = ((player.wins / player.matches) * 100).toFixed(1);
+  const topRate = (((player.wins + player.second) / player.matches) * 100).toFixed(1);
+  document.getElementById('advContent').innerHTML = `
+    <div class="stat-block">
+      <div class="stat-block-label">Player — ${player.name} ${player.tag}</div>
+      <div class="stat-row"><span class="stat-row-label">ELO Rating</span><span class="stat-row-value" style="color:#f39c12">${player.elo.toLocaleString()}</span></div>
+      <div class="stat-row"><span class="stat-row-label">K/D Ratio</span><span class="stat-row-value">${player.kd}</span></div>
+      <div class="stat-row"><span class="stat-row-label">Matches Played</span><span class="stat-row-value">${player.matches}</span></div>
+      <div class="stat-row"><span class="stat-row-label">Win Rate</span><span class="stat-row-value" style="color:#4eff91">${winRate}%</span></div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${winRate}%"></div></div>
+      <div class="stat-row"><span class="stat-row-label">Top 2 Rate</span><span class="stat-row-value" style="color:#ffe94e">${topRate}%</span></div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${topRate}%;background:var(--accent)"></div></div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-label">Placement Breakdown</div>
+      <div class="stat-row"><span class="stat-row-label" style="color:#4eff91">● 1st Place</span><span class="stat-row-value">${player.wins}</span></div>
+      <div class="stat-row"><span class="stat-row-label" style="color:#ffe94e">● 2nd Place</span><span class="stat-row-value">${player.second}</span></div>
+      <div class="stat-row"><span class="stat-row-label" style="color:#ff9a3c">● 3rd Place</span><span class="stat-row-value">${player.third}</span></div>
+      <div class="stat-row"><span class="stat-row-label" style="color:#ff3d6e">● 4th+</span><span class="stat-row-value">${player.losses}</span></div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-label">Rank Tier</div>
+      <div class="stat-row">
+        <span class="stat-row-label">Division</span>
+        <span class="stat-row-value tier-${player.tier}">${TIER_LABELS[TIERS.indexOf(player.tier)]}</span>
+      </div>
+      <div class="stat-row"><span class="stat-row-label">Region</span><span class="stat-row-value">${player.region.toUpperCase()}</span></div>
+      <div class="stat-row"><span class="stat-row-label">Last Active</span><span class="stat-row-value">${player.lastActive}</span></div>
+    </div>
+  `;
+  if (!advOpen) toggleAdvanced();
+}
+
+function toggleAdvanced() {
+  advOpen = !advOpen;
+  document.getElementById('advPanel').classList.toggle('open', advOpen);
+  if (advOpen && !document.getElementById('advContent').innerHTML.trim()) {
+    selectEntry(0);
+  }
+}
+
+// Ticker
+function buildTicker() {
+  const items = [
+    { text: 'VoidStrike ranked up to', highlight: 'LEGENDARY', change: 'up' },
+    { text: 'Season 4 ends in', highlight: '14 DAYS', change: null },
+    { text: 'NxT_Spectre new KD record', highlight: '4.21', change: 'up' },
+    { text: 'EU server maintenance', highlight: 'SAT 02:00 UTC', change: null },
+    { text: 'KairosFrag win streak', highlight: '18 GAMES', change: 'up' },
+    { text: 'New map NEXUS released', highlight: 'PLAY NOW', change: null },
+    { text: 'ph4ntom dropped to', highlight: 'MASTER', change: 'down' },
+    { text: 'Double XP weekend', highlight: 'ACTIVE', change: 'up' },
+    { text: 'Patch 4.7.2', highlight: 'DEPLOYED', change: null },
+    { text: 'Elara.X hit', highlight: '300 MATCHES', change: 'up' },
+  ];
+  const track = document.getElementById('tickerTrack');
+  const doubled = [...items, ...items];
+  track.innerHTML = doubled.map(item => `
+    <div class="ticker-item">
+      ${item.text}&nbsp;<strong>${item.highlight}</strong>
+      ${item.change ? `<span class="${item.change}">${item.change === 'up' ? '▲' : '▼'}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+buildTicker();
+renderLeaderboard();
+</script>
+</body>
+</html>

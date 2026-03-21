@@ -1,0 +1,547 @@
+/* ── Centering wrapper (fixed, pointer-events passthrough) ── */
+.panelOuter {
+  position: fixed;
+  inset: 0;
+  top: 64px; /* clear navbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  z-index: 300;
+  pointer-events: none;
+}
+
+/* ── Panel ── */
+.panel {
+  width: min(96vw, 1340px);
+  max-height: min(calc(100vh - 104px), 800px);
+  background: #0d0d16;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+/* ── Empty state ── */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 40px;
+}
+
+.emptyTitle {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 24px;
+  letter-spacing: 4px;
+  color: var(--muted);
+}
+
+.emptyText {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: rgba(240, 240, 240, 0.2);
+  text-align: center;
+}
+
+/* ── Body (two columns) ── */
+.body {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left column ── */
+.left {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px 24px;
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+/* ── Right column ── */
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ── Player header ── */
+.playerHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.playerHeadInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.playerNameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.playerRank {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.playerName {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.tierRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tierLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.matchCount {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  font-family: var(--font-mono), monospace;
+}
+
+.closeBtn:hover {
+  color: #ff3d6e;
+  border-color: #ff3d6e;
+  background: rgba(255, 61, 110, 0.08);
+}
+
+/* ── Section label ── */
+.sectionLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+/* ── Stat section ── */
+.statSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Stat bar ── */
+.statBar {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.statBarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.statBarLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.statBarValue {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.statBarTrack {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Placement rows ── */
+.placementRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.placementLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.placementBar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.placementPct {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--muted);
+  width: 34px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.placementCount {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Delta box ── */
+.deltaBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+.deltaLabel,
+.highScoreLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.deltaVal,
+.highScoreVal {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+/* ── Graph section ── */
+.graphSection {
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.graphHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.graphMeta {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.graphBox {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graphSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.graphEmpty,
+.graphLoading {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  flex: 1;
+}
+
+.loadingPulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(232, 255, 71, 0.4);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0   rgba(232,255,71,0.5); }
+  50%  { transform: scale(1.4);  box-shadow: 0 0 0 14px rgba(232,255,71,0); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(232,255,71,0); }
+}
+
+/* ── Match history ── */
+.matchSection {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.matchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.matchTitle {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.paginator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+
+.pageBtn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(232, 255, 71, 0.06);
+}
+
+.pageBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.pageInfo {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 36px;
+  text-align: center;
+}
+
+.toggleBtn {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid rgba(232, 255, 71, 0.3);
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.toggleBtn:hover {
+  background: rgba(232, 255, 71, 0.08);
+  border-color: var(--accent);
+}
+
+.tableWrap {
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  background: #0d0d16;
+  z-index: 1;
+}
+
+.table th {
+  padding: 6px 12px;
+  text-align: left;
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+}
+
+.table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tdDate {
+  color: var(--muted) !important;
+  font-size: 10px;
+}
+
+.tdTeammate {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.histLoading {
+  padding: 24px;
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Scrollbar styling ── */
+.left::-webkit-scrollbar,
+.tableWrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left::-webkit-scrollbar-track,
+.tableWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.left::-webkit-scrollbar-thumb,
+.tableWrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .panelOuter {
+    top: 0;
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .panel {
+    width: 100vw;
+    max-height: 90dvh;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .body {
+    flex-direction: column;
+  }
+
+  .left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+}

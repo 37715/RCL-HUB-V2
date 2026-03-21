@@ -1,0 +1,503 @@
+.page {
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 72px 64px 40px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.eyebrowLine {
+  width: 40px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.eyebrowText {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: clamp(72px, 10vw, 140px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.45) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 14px;
+}
+
+.heroSubtitle {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.65;
+}
+
+/* ═══════════════════════════════════════
+   UNIFIED NAV
+   Type row + optional difficulty chips
+   + a single accent line at the bottom
+═══════════════════════════════════════ */
+
+.nav {
+  padding: 0 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+.navTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* Type group: Finite | Infinite | Community */
+.typeGroup {
+  display: flex;
+  gap: 0;
+}
+
+.typeBtn {
+  padding: 14px 22px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  transition: color 0.18s, border-color 0.18s;
+  outline: none;
+  white-space: nowrap;
+}
+
+.typeBtn:hover { color: var(--text); }
+
+.typeBtnActive {
+  color: var(--type-color, var(--accent)) !important;
+  border-bottom-color: var(--type-color, var(--accent)) !important;
+}
+
+/* Difficulty chips */
+.diffChips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+}
+
+.diffChip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.07);
+  cursor: pointer;
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  outline: none;
+  white-space: nowrap;
+}
+
+.diffChip:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+.diffChipActive {
+  color: var(--diff-color, var(--accent)) !important;
+  border-color: var(--diff-color, var(--accent)) !important;
+  background: rgba(255,255,255,0.04);
+}
+
+.diffCount {
+  font-size: 9px;
+  opacity: 0.55;
+  letter-spacing: 1px;
+}
+
+
+/* ── Info bar ── */
+.infoBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+.infoDesc {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.infoCount {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-left: 24px;
+}
+
+/* ── Maze Grid ── */
+.mazeSection {
+  padding: 36px 64px 80px;
+}
+
+.mazeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* ── Maze Card ── */
+.mazeCard {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.22s;
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mazeCard:hover { transform: translateY(-3px); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.mazeVideo {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  display: block;
+}
+
+.cardPlayHint {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  opacity: 0;
+  transition: opacity 0.18s;
+  pointer-events: none;
+}
+
+.mazeCard:hover .cardPlayHint { opacity: 1; }
+
+.cardFooter {
+  padding: 11px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.diffLabel {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.mazeNum {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.difficultyTrack {
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.difficultyFill {
+  height: 100%;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Community Coming Soon ── */
+.comingSoon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 64px;
+}
+
+.comingSoonInner {
+  text-align: center;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.comingSoonLabel {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 36px;
+  letter-spacing: 3px;
+  color: var(--text);
+}
+
+.comingSoonText {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.submitBtn {
+  margin-top: 8px;
+  padding: 12px 28px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Modal ── */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modalPill {
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+}
+
+.modalLabel {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+.modalClose:hover { color: var(--text); }
+
+.modalVideo {
+  position: relative;
+  background: #000;
+  cursor: pointer;
+}
+
+.modalVideoEl {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+}
+
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+.playBtn {
+  font-size: 40px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1;
+}
+
+/* ── Playback controls ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  border-top: 1px solid var(--line);
+  background: rgba(0,0,0,0.25);
+}
+
+.ctrlBtn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+.ctrlBtn:hover { opacity: 1; }
+
+.timeLabel {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+.seekBar {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--cat-color, var(--accent)) 0%,
+    var(--cat-color, var(--accent)) var(--seek-pct, 0%),
+    rgba(255,255,255,0.1) var(--seek-pct, 0%),
+    rgba(255,255,255,0.1) 100%
+  );
+  cursor: pointer;
+  outline: none;
+}
+
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--accent));
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.seekBar::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+.seekBar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--accent));
+  border: none;
+  cursor: pointer;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .hero       { padding: 56px 32px 36px; }
+  .nav        { padding: 0 32px; }
+  .navTop     { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .diffChips  { justify-content: flex-start; }
+  .infoBar    { padding: 14px 32px; }
+  .mazeSection { padding: 28px 32px 64px; }
+  .mazeGrid   { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .hero       { padding: 40px 20px 28px; }
+  .nav        { padding: 0 20px; }
+  .infoBar    { padding: 12px 20px; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .mazeSection { padding: 20px 20px 56px; }
+  .mazeGrid   { grid-template-columns: 1fr; }
+  .comingSoon { padding: 40px 20px; }
+}
