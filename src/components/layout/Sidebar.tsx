@@ -12,6 +12,11 @@ function isStandalone() {
   )
 }
 
+function isMobile() {
+  if (typeof navigator === 'undefined') return false
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+}
+
 type SidebarItem =
   | { num: string; label: string; desc: string; href: string; external?: boolean }
   | { num: string; label: string; desc: string; href?: undefined }
@@ -60,10 +65,10 @@ function ItemContent({ item }: { item: SidebarItem }) {
 }
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
-  const [installed, setInstalled] = useState(true) // default true to avoid flash
+  const [showInstall, setShowInstall] = useState(false)
 
   useEffect(() => {
-    setInstalled(isStandalone())
+    setShowInstall(isMobile() && !isStandalone())
   }, [])
 
   function handleInstall() {
@@ -112,8 +117,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             )
           })}
 
-          {/* Install app — hidden if already installed as PWA */}
-          {!installed && (() => {
+          {/* Install app — mobile only, hidden if already installed as PWA */}
+          {showInstall && (() => {
             const i = SIDEBAR_ITEMS.length
             const cls = `${styles.item} ${open ? styles.itemVisible : ''}`
             const delay = { transitionDelay: open ? `${80 + i * 55}ms` : '0ms' }

@@ -1,51 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { PlayerHistoryMatch } from '@/lib/rclApi'
+import styles from './MatchHistoryTable.module.css'
 
 type SortKey = 'date' | 'teamPlace' | 'place' | 'score' | 'kd' | 'change'
 type SortDir = 'asc' | 'desc'
-
-const GRID = '36px 1fr 70px 70px 80px 80px 100px'
-
-const headerStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: GRID,
-  gap: '16px',
-  padding: '6px 20px',
-  fontFamily: 'var(--font-barlow), sans-serif',
-  fontSize: '9px',
-  fontWeight: 700,
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: 'var(--muted)',
-  marginBottom: '4px',
-}
-
-const rowStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: GRID,
-  alignItems: 'center',
-  gap: '16px',
-  padding: '14px 20px',
-  background: 'var(--card)',
-  border: '1px solid var(--card-border)',
-  marginBottom: '6px',
-  fontFamily: 'var(--font-mono), monospace',
-  fontSize: '12px',
-  color: 'var(--muted)',
-}
-
-const noDataStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-barlow), sans-serif',
-  fontSize: '13px',
-  fontWeight: 300,
-  letterSpacing: '1px',
-  color: 'rgba(240,240,240,0.25)',
-  fontStyle: 'italic',
-  marginTop: '32px',
-  lineHeight: '1.6',
-}
 
 function placeLabel(place: number): string {
   if (place === 1) return '1st'
@@ -67,60 +27,39 @@ function ratingColor(change: string): string {
   return 'var(--muted)'
 }
 
+function fmtDate(d: string): string {
+  const dt = new Date(d)
+  if (isNaN(dt.getTime())) return d
+  return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })
+}
+
 function sortMatches(matches: PlayerHistoryMatch[], key: SortKey, dir: SortDir): PlayerHistoryMatch[] {
   return [...matches].sort((a, b) => {
     let av: number, bv: number
     switch (key) {
-      case 'date':
-        av = new Date(a.date).getTime()
-        bv = new Date(b.date).getTime()
-        break
-      case 'teamPlace':
-        av = a.teamPlace || 99
-        bv = b.teamPlace || 99
-        break
-      case 'place':
-        av = a.place || 99
-        bv = b.place || 99
-        break
-      case 'score':
-        av = a.score
-        bv = b.score
-        break
-      case 'kd':
-        av = parseFloat(a.kd) || 0
-        bv = parseFloat(b.kd) || 0
-        break
-      case 'change':
-        av = parseFloat(a.change) || 0
-        bv = parseFloat(b.change) || 0
-        break
+      case 'date':      av = new Date(a.date).getTime(); bv = new Date(b.date).getTime(); break
+      case 'teamPlace': av = a.teamPlace || 99;          bv = b.teamPlace || 99;          break
+      case 'place':     av = a.place || 99;              bv = b.place || 99;              break
+      case 'score':     av = a.score;                    bv = b.score;                    break
+      case 'kd':        av = parseFloat(a.kd) || 0;     bv = parseFloat(b.kd) || 0;     break
+      case 'change':    av = parseFloat(a.change) || 0; bv = parseFloat(b.change) || 0; break
     }
     return dir === 'asc' ? av - bv : bv - av
   })
 }
 
-interface ColHeaderProps {
-  label: string
-  sortKey: SortKey
-  active: SortKey
-  dir: SortDir
-  align?: 'left' | 'center' | 'right'
-  onSort: (key: SortKey) => void
-}
-
-function ColHeader({ label, sortKey, active, dir, align = 'left', onSort }: ColHeaderProps) {
+function ColHeader({ label, sortKey, active, dir, align = 'left', onSort }: {
+  label: string; sortKey: SortKey; active: SortKey; dir: SortDir
+  align?: 'left' | 'center' | 'right'; onSort: (key: SortKey) => void
+}) {
   const isActive = active === sortKey
   return (
     <span
       onClick={() => onSort(sortKey)}
       style={{
-        textAlign: align,
-        cursor: 'pointer',
-        userSelect: 'none',
+        textAlign: align, cursor: 'pointer', userSelect: 'none',
         color: isActive ? 'var(--accent)' : 'var(--muted)',
-        display: 'flex',
-        alignItems: 'center',
+        display: 'flex', alignItems: 'center',
         justifyContent: align === 'right' ? 'flex-end' : align === 'center' ? 'center' : 'flex-start',
         gap: '4px',
       }}
@@ -136,22 +75,60 @@ function ColHeader({ label, sortKey, active, dir, align = 'left', onSort }: ColH
 export default function MatchHistoryTable({ history }: { history: PlayerHistoryMatch[] }) {
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   function handleSort(key: SortKey) {
     if (key === sortKey) {
       setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     } else {
       setSortKey(key)
-      // for place columns, asc = better; for score/kd/rating, desc = better
       setSortDir(key === 'teamPlace' || key === 'place' ? 'asc' : 'desc')
     }
   }
 
   const sorted = sortMatches(history, sortKey, sortDir)
 
+  if (isMobile) {
+    return (
+      <div style={{ border: '1px solid var(--card-border)', background: 'var(--card)' }}>
+        {sorted.slice(0, 20).map((match, i) => (
+          <div key={match.matchId || i} className={styles.card}>
+            <span className={styles.cardDate}>{fmtDate(match.date)}</span>
+            <div className={styles.cardStats}>
+              <span className={styles.cardStat} style={{ color: placeColor(match.teamPlace) }}>
+                {match.teamPlace > 0 ? placeLabel(match.teamPlace) : '—'}
+              </span>
+              <span style={{ color: 'var(--card-border)' }}>·</span>
+              <span className={styles.cardStat} style={{ color: placeColor(match.place) }}>
+                {match.place > 0 ? placeLabel(match.place) : '—'}
+              </span>
+              <span style={{ color: 'var(--card-border)' }}>·</span>
+              <span className={styles.cardStat}>{match.kd} kd</span>
+            </div>
+            <span className={styles.cardDelta} style={{ color: ratingColor(match.change) }}>
+              {match.change}
+            </span>
+          </div>
+        ))}
+        {history.length > 20 && (
+          <p className={styles.noData} style={{ padding: '0 16px 12px' }}>
+            Showing 20 of {history.length} matches.
+          </p>
+        )}
+      </div>
+    )
+  }
+
   return (
     <>
-      <div style={headerStyle}>
+      <div className={styles.header}>
         <span>#</span>
         <ColHeader label="Date" sortKey="date" active={sortKey} dir={sortDir} onSort={handleSort} />
         <ColHeader label="Team" sortKey="teamPlace" active={sortKey} dir={sortDir} align="center" onSort={handleSort} />
@@ -161,11 +138,9 @@ export default function MatchHistoryTable({ history }: { history: PlayerHistoryM
         <ColHeader label="Rating Δ" sortKey="change" active={sortKey} dir={sortDir} align="right" onSort={handleSort} />
       </div>
       {sorted.slice(0, 20).map((match, i) => (
-        <div key={match.matchId || i} style={rowStyle}>
+        <div key={match.matchId || i} className={styles.row}>
           <span style={{ fontSize: '10px', letterSpacing: '1px' }}>{String(i + 1).padStart(2, '0')}</span>
-          <span style={{ fontSize: '11px', color: 'var(--text)' }}>
-            {match.date ? new Date(match.date).toLocaleDateString() : '—'}
-          </span>
+          <span style={{ fontSize: '11px', color: 'var(--text)' }}>{fmtDate(match.date)}</span>
           <span style={{ textAlign: 'center', color: placeColor(match.teamPlace) }}>
             {match.teamPlace > 0 ? placeLabel(match.teamPlace) : '—'}
           </span>
@@ -178,7 +153,7 @@ export default function MatchHistoryTable({ history }: { history: PlayerHistoryM
         </div>
       ))}
       {history.length > 20 && (
-        <p style={noDataStyle}>Showing 20 of {history.length} matches.</p>
+        <p className={styles.noData}>Showing 20 of {history.length} matches.</p>
       )}
     </>
   )

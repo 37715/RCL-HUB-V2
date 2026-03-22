@@ -26,7 +26,7 @@ const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: 'calc(100vh - 64px)',
     position: 'relative',
-    padding: '48px 64px 80px',
+    padding: 'clamp(24px, 5vw, 48px) clamp(16px, 6vw, 64px) 80px',
   },
   backLink: {
     display: 'inline-flex',
@@ -71,7 +71,7 @@ const styles: Record<string, React.CSSProperties> = {
   } as React.CSSProperties,
   statCards: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: '16px',
     marginBottom: '56px',
   },

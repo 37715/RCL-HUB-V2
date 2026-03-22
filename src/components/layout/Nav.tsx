@@ -15,6 +15,7 @@ const NAV_LINKS = [
 export default function Nav() {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
     const handler = () => setSidebarOpen(true)
@@ -22,9 +23,19 @@ export default function Nav() {
     return () => window.removeEventListener('rcl:openmenu', handler)
   }, [])
 
+  useEffect(() => {
+    const onScroll = () => {
+      const current = window.scrollY
+      if (current <= 0) setHidden(false)
+      else if (current > 60) setHidden(true)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <>
-      <nav className={styles.nav}>
+      <nav className={`${styles.nav} ${hidden ? styles.navHidden : ''}`}>
         {/* Logo */}
         <Link href="/leaderboard" className={styles.brand}>
           RCL

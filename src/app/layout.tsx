@@ -1,4 +1,8 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+
+export const viewport: Viewport = {
+  themeColor: '#e8ff47',
+}
 import './globals.css'
 import Nav from '@/components/layout/Nav'
 import AmbientBackground from '@/components/layout/AmbientBackground'
@@ -48,8 +52,6 @@ export const metadata: Metadata = {
     shortcut: '/icon.svg',
     apple: '/icons/apple-touch-icon.png',
   },
-
-  themeColor: '#e8ff47',
 
   manifest: '/manifest.webmanifest',
 

@@ -142,4 +142,12 @@
   .brand { padding: 0 20px; font-size: 22px; }
   .links { display: none; }
   .menuBtn { padding: 0 20px; }
+
+  .nav {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .navHidden {
+    transform: translateY(-100%);
+  }
 }

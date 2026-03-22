@@ -250,7 +250,7 @@ export default function AdvancedStatsPanel({ player, rank, season, isOpen, onClo
                     <div className={styles.tierRow}>
                       <Image src={RANK_IMAGES[player.tier]} alt={player.tier} width={20} height={20} />
                       <span className={styles.tierLabel} style={{ color: tierColor }}>{player.tier}</span>
-                      <span className={styles.matchCount}>{player.matches} m</span>
+                      <span className={styles.matchCount}>{player.matches} matches</span>
                     </div>
                   </div>
                   <button className={styles.closeBtn} onClick={onClose}>✕</button>
