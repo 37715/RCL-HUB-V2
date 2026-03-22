@@ -8,7 +8,25 @@
       "Bash(npm run:*)",
       "Bash(npx next:*)",
       "Bash(find 'D:\\\\ai and coding\\\\newleaderboard' -type f \\\\\\(-name *auth* -o -name *login* -o -name *user* -o -name *settings* \\\\\\) ! -path */node_modules/* ! -path */.next/*)",
-      "Bash(grep -r \"localStorage\\\\|sessionStorage\\\\|IndexedDB\\\\|useContext\\\\|createContext\\\\|Provider\" 'D:\\\\ai and coding\\\\newleaderboard\\\\src' --include=*.ts --include=*.tsx)"
+      "Bash(grep -r \"localStorage\\\\|sessionStorage\\\\|IndexedDB\\\\|useContext\\\\|createContext\\\\|Provider\" 'D:\\\\ai and coding\\\\newleaderboard\\\\src' --include=*.ts --include=*.tsx)",
+      "Bash(bash \"C:/Users/ellis/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/brainstorming/scripts/start-server.sh\" --project-dir \"D:/ai and coding/newleaderboard\")",
+      "Bash(node -e \"require\\(''''sharp''''\\)\")",
+      "Bash(where magick:*)",
+      "Bash(where convert:*)",
+      "Bash(npm --version)",
+      "Bash(node scripts/generate-icons.mjs)",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/bebasneuepro/v14/WSBMBoaI9bOvJXFgXoI5PVZEbbyqVg.woff2\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.woff2\")",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/bebasneuepro/v14/WSBLBoaI9bOvJXFgXoI5PVZEbbyqVg.woff2\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.woff2\")",
+      "Bash(find 'D:/ai and coding/newleaderboard/node_modules/@fontsource/bebas-neue' -name *.ttf -o -name *.woff2)",
+      "Bash(find node_modules -name *bebas* -name *.ttf)",
+      "Bash(curl -L \"https://github.com/dharmatype/Bebas-Neue/raw/master/fonts/BN/ttf/BebasNeue-Regular.ttf\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.ttf\")",
+      "Bash(python3 -c \":*)",
+      "Bash(curl -L -H \"User-Agent: Mozilla/5.0\" \"https://github.com/dharmatype/Bebas-Neue/blob/master/fonts/BN/ttf/BebasNeue-Regular.ttf?raw=true\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.ttf\")",
+      "Bash(node:*)",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/bebasneuepro/v14/WSBMBoaI9bOvJXFgXoI5PVZEbbzqGg.ttf\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.ttf\")",
+      "Bash(node -e \"const f=require\\(''''fs''''\\).readFileSync\\(''''D:/ai and coding/newleaderboard/scripts/BebasNeue.ttf''''\\); console.log\\(''''Size:'''', f.length, ''''Header:'''', f.slice\\(0,4\\).toString\\(''''hex''''\\)\\)\")",
+      "Bash(curl -L \"https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5.0.8/files/bebas-neue-latin-400-normal.woff2\" -o \"D:/ai and coding/newleaderboard/scripts/BebasNeue.woff2\")",
+      "Bash(node -e \"const f=require\\(''''fs''''\\).readFileSync\\(''''D:/ai and coding/newleaderboard/scripts/BebasNeue.woff2''''\\); console.log\\(''''Size:'''', f.length, ''''Header:'''', f.slice\\(0,4\\).toString\\(''''hex''''\\)\\)\")"
     ]
   }
 }

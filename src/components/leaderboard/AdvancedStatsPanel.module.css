@@ -15,7 +15,7 @@
 .panel {
   width: min(96vw, 1340px);
   max-height: min(calc(100vh - 104px), 800px);
-  background: #0d0d16;
+  background: #080810;
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -43,9 +43,9 @@
 
 .emptyText {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 2px;
-  color: rgba(240, 240, 240, 0.2);
+  color: rgba(240, 240, 240, 0.55);
   text-align: center;
 }
 
@@ -121,7 +121,7 @@
 
 .tierLabel {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -129,7 +129,7 @@
 
 .matchCount {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 1px;
   color: var(--muted);
 }
@@ -159,7 +159,7 @@
 /* ── Section label ── */
 .sectionLabel {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -192,7 +192,7 @@
 
 .statBarLabel {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -244,7 +244,7 @@
 
 .placementPct {
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
   width: 34px;
   text-align: right;
@@ -253,7 +253,7 @@
 
 .placementCount {
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text);
   width: 24px;
   text-align: right;
@@ -273,7 +273,7 @@
 .deltaLabel,
 .highScoreLabel {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -305,7 +305,7 @@
 
 .graphMeta {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: var(--muted);
 }
@@ -325,9 +325,9 @@
 .graphEmpty,
 .graphLoading {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
 }
 
@@ -372,7 +372,7 @@
 
 .matchTitle {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -414,7 +414,7 @@
 
 .pageInfo {
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   min-width: 36px;
   text-align: center;
@@ -422,7 +422,7 @@
 
 .toggleBtn {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -453,7 +453,7 @@
 .table thead {
   position: sticky;
   top: 0;
-  background: #0d0d16;
+  background: #080810;
   z-index: 1;
 }
 
@@ -461,7 +461,7 @@
   padding: 6px 12px;
   text-align: left;
   font-family: var(--font-barlow), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -472,19 +472,23 @@
 
 .table td {
   padding: 10px 12px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   white-space: nowrap;
 }
 
+.table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .table tbody tr:hover td {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(232, 255, 71, 0.05);
 }
 
 .tdDate {
   color: var(--muted) !important;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .tdTeammate {
@@ -522,26 +526,64 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .panelOuter {
-    top: 0;
+    top: 64px;
     padding: 0;
-    align-items: flex-end;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 500;
   }
 
   .panel {
     width: 100vw;
-    max-height: 90dvh;
+    height: calc(100dvh - 64px - 56px);
+    max-height: none;
     border-left: none;
     border-right: none;
     border-bottom: none;
+    overflow-y: auto;
   }
 
   .body {
     flex-direction: column;
+    overflow: visible;
   }
 
   .left {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--line);
+    overflow-y: visible;
+  }
+
+  .right {
+    flex-shrink: 0;
+  }
+
+  .matchSection {
+    overflow: visible;
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide less critical columns: Teammate, Played%, Alive%, Score */
+  .table th:nth-child(2),
+  .table td:nth-child(2),
+  .table th:nth-child(7),
+  .table td:nth-child(7),
+  .table th:nth-child(8),
+  .table td:nth-child(8),
+  .table th:nth-child(9),
+  .table td:nth-child(9) {
+    display: none;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 }

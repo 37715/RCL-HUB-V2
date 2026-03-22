@@ -66,76 +66,66 @@ export default function LeaderboardControls({
 
       {/* Row 2: filter row — only shown for TST which has real data */}
       <div className={styles.filterRow} style={{ visibility: gameMode === 'tst' ? 'visible' : 'hidden', pointerEvents: gameMode === 'tst' ? 'auto' : 'none' }}>
-        {/* Season */}
-        <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Season</span>
-          <div className={styles.buttonSet}>
-            {SEASONS.map((s) => (
-              <button
-                key={s.value}
-                className={`${styles.filterBtn} ${season === s.value ? styles.filterBtnActive : ''}`}
-                onClick={() => onSeasonChange(s.value)}
-              >
-                <span className={styles.btnLabel}>{s.label}</span>
-              </button>
-            ))}
+        {/* Filter chips — scrollable strip on mobile */}
+        <div className={styles.filterChips}>
+          {/* Season — hidden on mobile (S4 is always current) */}
+          <div className={`${styles.filterGroup} ${styles.mobileHide}`}>
+            <span className={styles.filterLabel}>Season</span>
+            <div className={styles.buttonSet}>
+              {SEASONS.map((s) => (
+                <button
+                  key={s.value}
+                  className={`${styles.filterBtn} ${season === s.value ? styles.filterBtnActive : ''}`}
+                  onClick={() => onSeasonChange(s.value)}
+                >
+                  <span className={styles.btnLabel}>{s.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className={styles.divider} />
+          <div className={`${styles.divider} ${styles.mobileHide}`} />
 
-        {/* Region */}
-        <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Region</span>
-          <div className={styles.buttonSet}>
-            {REGIONS.map((r) => (
-              <button
-                key={r.value}
-                className={`${styles.filterBtn} ${region === r.value ? styles.filterBtnActive : ''}`}
-                onClick={() => onRegionChange(r.value)}
-              >
-                <span className={styles.btnLabel}>{r.label}</span>
-              </button>
-            ))}
+          {/* Region */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>Region</span>
+            <div className={styles.buttonSet}>
+              {REGIONS.map((r) => (
+                <button
+                  key={r.value}
+                  className={`${styles.filterBtn} ${region === r.value ? styles.filterBtnActive : ''}`}
+                  onClick={() => onRegionChange(r.value)}
+                >
+                  <span className={styles.btnLabel}>{r.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className={styles.divider} />
+          <div className={styles.divider} />
 
-        {/* Period */}
-        <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Period</span>
-          <div className={styles.buttonSet}>
-            {PERIODS.map((p) => (
-              <button
-                key={p.value}
-                className={`${styles.filterBtn} ${period === p.value ? styles.filterBtnActive : ''}`}
-                onClick={() => onPeriodChange(p.value)}
-              >
-                <span className={styles.btnLabel}>{p.label}</span>
-              </button>
-            ))}
+          {/* Period */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>Period</span>
+            <div className={styles.buttonSet}>
+              {PERIODS.map((p) => (
+                <button
+                  key={p.value}
+                  className={`${styles.filterBtn} ${period === p.value ? styles.filterBtnActive : ''}`}
+                  onClick={() => onPeriodChange(p.value)}
+                >
+                  <span className={styles.btnLabel}>{p.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className={styles.spacer} />
 
-        {/* Records */}
+        {/* Match History — desktop only */}
         <button
-          className={`${styles.advancedBtn} ${recordsOpen ? styles.advancedActive : ''}`}
-          onClick={onRecordsOpen}
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ display: 'block' }}>
-            <path d="M6 1L4 3H1v3c0 3 2.5 5.5 5 6 2.5-.5 5-3 5-6V3H8L6 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" fill="none"/>
-            <path d="M4 9.5h4M6 9.5V11M4 11h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-          </svg>
-          <span className={styles.btnLabel}>Records</span>
-          <div className={styles.activeDot} />
-        </button>
-
-        {/* Match History */}
-        <button
-          className={`${styles.advancedBtn} ${matchHistoryOpen ? styles.advancedActive : ''}`}
+          className={`${styles.advancedBtn} ${matchHistoryOpen ? styles.advancedActive : ''} ${styles.mobileHide}`}
           onClick={onMatchHistoryOpen}
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ display: 'block' }}>
@@ -147,20 +137,34 @@ export default function LeaderboardControls({
           <div className={styles.activeDot} />
         </button>
 
-        {/* Advanced stats */}
-        <button
-          className={`${styles.advancedBtn} ${statsMode === 'advanced' ? styles.advancedActive : ''}`}
-          onClick={onStatsModeToggle}
-        >
-          <div className={styles.barsIcon}>
-            <span style={{ height: '6px' }} />
-            <span style={{ height: '10px' }} />
-            <span style={{ height: '8px' }} />
-            <span style={{ height: '14px' }} />
-          </div>
-          <span className={styles.btnLabel}>Advanced Stats</span>
-          <div className={styles.activeDot} />
-        </button>
+        {/* Records + Advanced Stats — grouped side-by-side on mobile */}
+        <div className={styles.btnGroup}>
+          <button
+            className={`${styles.advancedBtn} ${recordsOpen ? styles.advancedActive : ''}`}
+            onClick={onRecordsOpen}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ display: 'block' }}>
+              <path d="M6 1L4 3H1v3c0 3 2.5 5.5 5 6 2.5-.5 5-3 5-6V3H8L6 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" fill="none"/>
+              <path d="M4 9.5h4M6 9.5V11M4 11h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+            </svg>
+            <span className={styles.btnLabel}>Records</span>
+            <div className={styles.activeDot} />
+          </button>
+
+          <button
+            className={`${styles.advancedBtn} ${statsMode === 'advanced' ? styles.advancedActive : ''}`}
+            onClick={onStatsModeToggle}
+          >
+            <div className={styles.barsIcon}>
+              <span style={{ height: '6px' }} />
+              <span style={{ height: '10px' }} />
+              <span style={{ height: '8px' }} />
+              <span style={{ height: '14px' }} />
+            </div>
+            <span className={styles.btnLabel}>Advanced Stats</span>
+            <div className={styles.activeDot} />
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -163,8 +163,9 @@
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 48px 20px 0; }
-  .heroInner { flex-direction: column; align-items: flex-start; padding-bottom: 24px; }
+  .hero { padding: 32px 16px 0; }
+  .heroInner { flex-direction: column; align-items: flex-start; padding-bottom: 20px; gap: 12px; }
   .heroRight { align-items: flex-start; }
-  .tableSection { padding: 0 20px 60px; }
+  .tableSection { padding: 0 0 80px; }
+  .panelBackdrop { z-index: 450; }
 }

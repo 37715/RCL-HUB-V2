@@ -1,3 +1,14 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About',
+  description: 'What is Retrocycles League and where is it going. Learn about the competitive scene, the vision, and the people behind RCL.',
+  openGraph: {
+    title: 'About RCL',
+    description: 'What is Retrocycles League and where is it going.',
+  },
+}
+
 export default function AboutPage() {
   return (
     <div style={{
@@ -113,7 +124,7 @@ export default function AboutPage() {
         {/* Divider */}
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
 
-        {/* Block 3 */}
+        {/* Block 3 — future */}
         <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
           <span style={{
             fontFamily: 'var(--font-mono)',
@@ -124,50 +135,6 @@ export default function AboutPage() {
             paddingTop: '6px',
             width: '32px',
           }}>03</span>
-          <div>
-            <p style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: '28px',
-              letterSpacing: '3px',
-              color: 'var(--accent)',
-              marginBottom: '14px',
-              lineHeight: 1,
-            }}>the hub</p>
-            <p style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '13px',
-              color: 'rgba(240,240,240,0.65)',
-              lineHeight: 1.9,
-              margin: 0,
-            }}>
-              the hub is where you create an account, log in with{' '}
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--accent)',
-                background: 'rgba(232,255,71,0.08)',
-                padding: '1px 6px',
-                borderRadius: '3px',
-                fontSize: '12px',
-              }}>/login {'<user>'}@rcl</span>{' '}
-              in-game, and get into pickup or ranked play.
-            </p>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
-
-        {/* Block 4 — future */}
-        <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            color: 'rgba(232,255,71,0.35)',
-            letterSpacing: '2px',
-            flexShrink: 0,
-            paddingTop: '6px',
-            width: '32px',
-          }}>04</span>
           <div>
             <p style={{
               fontFamily: 'var(--font-bebas)',

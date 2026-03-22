@@ -215,7 +215,7 @@ export default function SettingsPage() {
                   cursor: 'pointer',
                 }}
                   onClick={() => update('laggyMode', !settings.laggyMode)}
-                >my computer is laggy</p>
+                >my device is laggy</p>
                 <p style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '11px',

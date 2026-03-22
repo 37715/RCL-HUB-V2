@@ -1,7 +1,16 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import styles from './Sidebar.module.css'
+
+function isStandalone() {
+  if (typeof window === 'undefined') return true
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  )
+}
 
 type SidebarItem =
   | { num: string; label: string; desc: string; href: string; external?: boolean }
@@ -10,8 +19,8 @@ type SidebarItem =
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     num: '01',
-    label: 'home',
-    desc: 'the home of competitive retrocycles.',
+    label: 'account',
+    desc: 'manage your rcl profile, stats, and account settings.',
     href: 'https://retrocyclesleague.com/',
     external: true,
   },
@@ -51,6 +60,17 @@ function ItemContent({ item }: { item: SidebarItem }) {
 }
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
+  const [installed, setInstalled] = useState(true) // default true to avoid flash
+
+  useEffect(() => {
+    setInstalled(isStandalone())
+  }, [])
+
+  function handleInstall() {
+    onClose()
+    setTimeout(() => window.dispatchEvent(new Event('rcl:pwa:install')), 300)
+  }
+
   return (
     <>
       <div
@@ -58,6 +78,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         onClick={onClose}
       />
       <div className={`${styles.panel} ${open ? styles.panelOpen : ''}`}>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+        </button>
         <nav className={styles.inner}>
           {SIDEBAR_ITEMS.map((item, i) => {
             const cls = `${styles.item} ${open ? styles.itemVisible : ''}`
@@ -85,6 +111,20 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               </Link>
             )
           })}
+
+          {/* Install app — hidden if already installed as PWA */}
+          {!installed && (() => {
+            const i = SIDEBAR_ITEMS.length
+            const cls = `${styles.item} ${open ? styles.itemVisible : ''}`
+            const delay = { transitionDelay: open ? `${80 + i * 55}ms` : '0ms' }
+            return (
+              <button key="install" className={cls} style={delay} onClick={handleInstall}>
+                <span className={styles.num}>0{i + 1}</span>
+                <span className={styles.label}>install</span>
+                <span className={styles.desc}>add rcl to your home screen as an app.</span>
+              </button>
+            )
+          })()}
         </nav>
 
         <div className={styles.footer}>

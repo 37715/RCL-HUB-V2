@@ -221,7 +221,7 @@
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.7);
   opacity: 0;
   transition: opacity 0.18s;
   pointer-events: none;

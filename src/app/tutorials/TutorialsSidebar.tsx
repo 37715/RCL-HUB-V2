@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import css from './TutorialsSidebar.module.css'
 
 interface Topic { title: string; slug: string }
 interface Section { title: string; slug: string; comingSoon: boolean; topics: Topic[] }
@@ -40,14 +41,17 @@ export default function TutorialsSidebar({ sections }: { sections: Section[] }) 
   }, [sections])
 
   return (
-    <nav style={{
-      position: 'sticky',
-      top: '64px',
-      height: 'calc(100vh - 64px)',
-      overflowY: 'auto',
-      borderRight: '1px solid var(--line)',
-      padding: '40px 0',
-    }}>
+    <nav
+      className={css.sidebar}
+      style={{
+        position: 'sticky',
+        top: '64px',
+        height: 'calc(100vh - 64px)',
+        overflowY: 'auto',
+        borderRight: '1px solid var(--line)',
+        padding: '40px 0',
+      }}
+    >
       <span style={{
         fontFamily: 'var(--font-barlow), sans-serif',
         fontSize: '9px',

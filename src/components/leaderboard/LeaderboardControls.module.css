@@ -78,6 +78,16 @@
   flex-wrap: wrap;
 }
 
+/* Groups season/region/period — transparent to flex on desktop */
+.filterChips {
+  display: contents;
+}
+
+/* Groups Records + Advanced Stats — transparent to flex on desktop */
+.btnGroup {
+  display: contents;
+}
+
 .filterGroup {
   display: flex;
   align-items: center;
@@ -86,7 +96,7 @@
 
 .filterLabel {
   font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -177,7 +187,7 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -253,4 +263,103 @@
   .filterRow { row-gap: 12px; flex-wrap: wrap; }
   .divider { display: none; }
   .spacer { width: 100%; flex-basis: 100%; }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    padding: 0;
+    gap: 0;
+  }
+
+  /* Mode tabs: horizontal scroll */
+  .modeTabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 16px;
+  }
+
+  .modeTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modeTab {
+    font-size: 14px;
+    letter-spacing: 2px;
+    padding: 12px 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Filter row: two-row layout — chips scroll on row 1, Advanced Stats on row 2 */
+  .filterRow {
+    flex-direction: column;
+    align-items: stretch;
+    overflow-x: visible;
+    flex-wrap: nowrap;
+    padding: 0;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Chip strip: scrollable */
+  .filterChips {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    padding: 10px 16px;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .filterChips::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Filter groups: inline, no label text */
+  .filterGroup {
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .filterLabel {
+    display: none;
+  }
+
+  .filterBtn {
+    padding: 7px 12px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+
+  /* Records + Advanced Stats: side-by-side row */
+  .btnGroup {
+    display: flex;
+    border-top: 1px solid var(--line);
+  }
+
+  .btnGroup .advancedBtn {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    justify-content: center;
+    border: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .btnGroup .advancedBtn:last-child {
+    border-right: none;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  /* Hide Records and MatchHistory buttons — they live in bottom nav */
+  .mobileHide {
+    display: none;
+  }
 }

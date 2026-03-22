@@ -80,6 +80,17 @@ export default function LeaderboardClient() {
     fetchPlayers()
   }, [fetchPlayers])
 
+  useEffect(() => {
+    const openMatches = () => setMatchHistoryOpen(true)
+    const openRecords = () => setRecordsOpen(true)
+    window.addEventListener('rcl:openmatches', openMatches)
+    window.addEventListener('rcl:openrecords', openRecords)
+    return () => {
+      window.removeEventListener('rcl:openmatches', openMatches)
+      window.removeEventListener('rcl:openrecords', openRecords)
+    }
+  }, [])
+
   function handleSort(key: SortKey) {
     if (sortBy === key) {
       setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))
@@ -197,6 +208,7 @@ export default function LeaderboardClient() {
 
       {advPanelOpen && <div className={styles.panelBackdrop} onClick={handleClosePanel} />}
       <AdvancedStatsPanel player={selectedPlayer} rank={selectedPlayerRank} season={season} isOpen={advPanelOpen} onClose={handleClosePanel} />
+
     </div>
   )
 

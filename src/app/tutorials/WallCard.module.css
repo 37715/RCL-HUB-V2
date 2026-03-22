@@ -1,0 +1,41 @@
+.card {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #080808;
+  border-right: 1px solid var(--card-border);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.infoPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 36px 32px;
+  gap: 20px;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .imageWrap {
+    border-right: none;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .infoPanel {
+    padding: 20px 16px;
+  }
+}

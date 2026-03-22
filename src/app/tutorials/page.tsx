@@ -1,9 +1,21 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Resources',
+  description: 'Guides, tutorials, camera setups, wall configs, and keybinds for Retrocycles League players.',
+  openGraph: {
+    title: 'RCL Resources & Tutorials',
+    description: 'Guides, camera setups, wall configs, and keybinds for RCL players.',
+  },
+}
+
 import React from 'react'
 import Image from 'next/image'
 import CameraCard from './CameraCard'
 import WallCard from './WallCard'
 import TutorialsSidebar from './TutorialsSidebar'
 import CollapsibleSection from './CollapsibleSection'
+import css from './page.module.css'
 
 /* ─── Sidebar nav ──────────────────────────────────────────────────────────── */
 const SECTIONS = [
@@ -86,19 +98,7 @@ zone_alpha .17`,
   },
 ]
 
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: 'calc(100vh - 64px)',
-    display: 'grid',
-    gridTemplateColumns: '240px 1fr',
-    alignItems: 'start',
-  },
-
-  /* Content */
-  content: {
-    padding: '64px 80px 120px',
-    minWidth: 0,
-  },
+const inlineStyles: Record<string, React.CSSProperties> = {
   eyebrow: {
     display: 'flex',
     alignItems: 'center',
@@ -123,14 +123,8 @@ const styles: Record<string, React.CSSProperties> = {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
-    marginBottom: '64px',
   } as React.CSSProperties,
 
-  /* Section */
-  section: { scrollMarginTop: '96px' },
-  sectionDivider: { display: 'none' },
-
-  /* Topic */
   topic: { marginBottom: '56px', scrollMarginTop: '96px' },
   topicLabel: {
     fontFamily: 'var(--font-barlow), sans-serif',
@@ -164,8 +158,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderBottom: '1px solid rgba(232,255,71,0.3)',
     paddingBottom: '1px',
   },
-
-  /* Callout box */
   callout: {
     background: 'rgba(232,255,71,0.04)',
     border: '1px solid rgba(232,255,71,0.15)',
@@ -185,7 +177,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'var(--accent)',
     fontWeight: 700,
   },
-
   cameraGrid: {
     display: 'flex',
     flexDirection: 'column' as const,
@@ -195,33 +186,33 @@ const styles: Record<string, React.CSSProperties> = {
 
 export default function ResourcesPage() {
   return (
-    <div style={styles.page}>
+    <div className={css.page}>
 
       <TutorialsSidebar sections={SECTIONS} />
 
       {/* ── Content ── */}
-      <main style={styles.content}>
-        <div style={styles.eyebrow}>
-          <div style={styles.eyebrowLine} />
-          <span style={styles.eyebrowText}>Knowledge Base</span>
+      <div className={css.content}>
+        <div style={inlineStyles.eyebrow}>
+          <div style={inlineStyles.eyebrowLine} />
+          <span style={inlineStyles.eyebrowText}>Knowledge Base</span>
         </div>
-        <h1 style={styles.pageTitle}>Resources</h1>
+        <h1 style={inlineStyles.pageTitle} className={css.pageTitle}>Resources</h1>
 
         {/* ══ Game Setup ══ */}
         <section id="game-setup" style={{ scrollMarginTop: '96px' }}>
         <CollapsibleSection title="Game Setup">
 
           {/* Account Creation */}
-          <div id="account-creation" style={styles.topic}>
-            <span style={styles.topicLabel}>01 — Setup</span>
-            <h2 style={styles.topicTitle}>Account Creation</h2>
-            <p style={styles.body}>
+          <div id="account-creation" style={inlineStyles.topic}>
+            <span style={inlineStyles.topicLabel}>01 — Setup</span>
+            <h2 style={inlineStyles.topicTitle}>Account Creation</h2>
+            <p style={inlineStyles.body}>
               To play ranked matches you need an account to login to in-game.{' '}
               <a
                 href="https://retrocyclesleague.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={styles.link}
+                style={inlineStyles.link}
               >
                 Create your account at retrocyclesleague.com
               </a>
@@ -230,11 +221,11 @@ export default function ResourcesPage() {
           </div>
 
           {/* Custom Cameras */}
-          <div id="custom-cameras" style={styles.topic}>
-            <span style={styles.topicLabel}>02 — Setup</span>
-            <h2 style={styles.topicTitle}>Custom Cameras</h2>
+          <div id="custom-cameras" style={inlineStyles.topic}>
+            <span style={inlineStyles.topicLabel}>02 — Setup</span>
+            <h2 style={inlineStyles.topicTitle}>Custom Cameras</h2>
 
-            <p style={styles.body}>
+            <p style={inlineStyles.body}>
               Having a good camera is very important for Retrocycles. A greater FOV and
               look-ahead gives more visibility of the battlefield and incoming walls, which
               tends to benefit Fortress players most. A closer, tighter camera can feel more
@@ -242,18 +233,18 @@ export default function ResourcesPage() {
               and experimentation is encouraged.
             </p>
 
-            <div style={styles.callout}>
-              <p style={styles.calloutText}>
-                <span style={styles.calloutStrong}>How to apply: </span>
-                Go to the <span style={styles.calloutStrong}>About</span> section in the in-game
-                menu and note the location of your <span style={styles.calloutStrong}>user.cfg</span> file.
+            <div style={inlineStyles.callout}>
+              <p style={inlineStyles.calloutText}>
+                <span style={inlineStyles.calloutStrong}>How to apply: </span>
+                Go to the <span style={inlineStyles.calloutStrong}>About</span> section in the in-game
+                menu and note the location of your <span style={inlineStyles.calloutStrong}>user.cfg</span> file.
                 In the same directory, create a new file called{' '}
-                <span style={styles.calloutStrong}>autoexec.cfg</span> and paste the camera
+                <span style={inlineStyles.calloutStrong}>autoexec.cfg</span> and paste the camera
                 settings of your choice inside it. The settings will load automatically on startup.
               </p>
             </div>
 
-            <div style={styles.cameraGrid}>
+            <div style={inlineStyles.cameraGrid}>
               {CAMERAS.map((cam, i) => (
                 <CameraCard key={cam.name} name={cam.name} image={cam.image} config={cam.config} index={i} />
               ))}
@@ -262,11 +253,11 @@ export default function ResourcesPage() {
           </div>
 
           {/* Custom Walls */}
-          <div id="custom-walls" style={styles.topic}>
-            <span style={styles.topicLabel}>03 — Setup</span>
-            <h2 style={styles.topicTitle}>Custom Walls</h2>
+          <div id="custom-walls" style={inlineStyles.topic}>
+            <span style={inlineStyles.topicLabel}>03 — Setup</span>
+            <h2 style={inlineStyles.topicTitle}>Custom Walls</h2>
 
-            <p style={styles.body}>
+            <p style={inlineStyles.body}>
               Wall textures change the appearance of the cycle trails left on the arena floor.
               Download the file and place it in the{' '}
               <span style={{ color: 'rgba(232,255,71,0.8)', fontWeight: 600 }}>textures</span>{' '}
@@ -298,11 +289,11 @@ export default function ResourcesPage() {
           </div>
 
           {/* Keybinds */}
-          <div id="keybinds" style={styles.topic}>
-            <span style={styles.topicLabel}>04 — Setup</span>
-            <h2 style={styles.topicTitle}>Keybinds</h2>
+          <div id="keybinds" style={inlineStyles.topic}>
+            <span style={inlineStyles.topicLabel}>04 — Setup</span>
+            <h2 style={inlineStyles.topicTitle}>Keybinds</h2>
 
-            <p style={styles.body}>
+            <p style={inlineStyles.body}>
               Setting up <strong style={{ color: 'var(--text)' }}>two keys for left and two for right</strong> is
               important for fast, efficient turns — having a redundant key on each side means
               you can roll fingers across keys to execute near-instant direction changes without
@@ -317,18 +308,8 @@ export default function ResourcesPage() {
                 { src: '/assets/binds/2.png', label: 'Homerow Piano' },
                 { src: '/assets/binds/3.png', label: 'Ellis Piano' },
               ].map((bind, i) => (
-                <div key={i} style={{
-                  display: 'grid',
-                  gridTemplateColumns: '160px 1fr',
-                  border: '1px solid var(--card-border)',
-                  background: 'var(--card)',
-                  overflow: 'hidden',
-                  alignItems: 'center',
-                }}>
-                  <div style={{
-                    padding: '20px 24px',
-                    borderRight: '1px solid var(--card-border)',
-                  }}>
+                <div key={i} className={css.bindCard}>
+                  <div className={css.bindLabel}>
                     <span style={{
                       fontFamily: 'var(--font-bebas), sans-serif',
                       fontSize: '18px',
@@ -338,21 +319,13 @@ export default function ResourcesPage() {
                       lineHeight: 1.2,
                     }}>{bind.label}</span>
                   </div>
-                  <div style={{
-                    padding: '24px 32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}>
+                  <div className={css.bindImageWrap}>
                     <Image
                       src={bind.src}
                       alt={bind.label}
                       width={1200}
                       height={400}
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        objectFit: 'contain',
-                      }}
+                      style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
                     />
                   </div>
                 </div>
@@ -366,7 +339,6 @@ export default function ResourcesPage() {
         {/* ══ Tutorials — Basic ══ */}
         <section id="tutorials-basic" style={{ scrollMarginTop: '96px' }}>
         <CollapsibleSection title="Tutorials — Basic">
-          <div style={styles.sectionDivider} />
           <div style={{
             border: '1px solid var(--card-border)',
             background: 'var(--card)',
@@ -384,7 +356,7 @@ export default function ResourcesPage() {
               color: 'var(--accent)',
               textShadow: '0 0 30px rgba(232,255,71,0.25)',
             }}>Coming Soon</span>
-            <p style={{ ...styles.body, margin: 0, textAlign: 'center' }}>
+            <p style={{ ...inlineStyles.body, margin: 0, textAlign: 'center' }}>
               Beginner guides covering movement, basic strategy, and game modes are in development.
             </p>
           </div>
@@ -411,14 +383,14 @@ export default function ResourcesPage() {
               color: 'var(--accent)',
               textShadow: '0 0 30px rgba(232,255,71,0.25)',
             }}>Coming Soon</span>
-            <p style={{ ...styles.body, margin: 0, textAlign: 'center' }}>
+            <p style={{ ...inlineStyles.body, margin: 0, textAlign: 'center' }}>
               Advanced guides covering high-level tactics, team play, and competitive mechanics are in development.
             </p>
           </div>
         </CollapsibleSection>
         </section>
 
-      </main>
+      </div>
 
     </div>
   )

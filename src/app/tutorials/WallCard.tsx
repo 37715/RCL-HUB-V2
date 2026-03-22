@@ -2,40 +2,27 @@
 
 import React from 'react'
 import Image from 'next/image'
+import css from './WallCard.module.css'
 
 interface Props {
   name: string
   previewImage: string
-  downloadPath?: string   // undefined = no download (e.g. Syn turns walls off)
+  downloadPath?: string
   noDownloadReason?: string
   index: number
 }
 
 export default function WallCard({ name, previewImage, downloadPath, noDownloadReason, index }: Props) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '3fr 2fr',
-      border: '1px solid var(--card-border)',
-      background: 'var(--card)',
-      overflow: 'hidden',
-      minWidth: 0,
-    }}>
+    <div className={css.card}>
       {/* Preview image */}
-      <div style={{
-        position: 'relative',
-        aspectRatio: '16/9',
-        background: '#080808',
-        borderRight: '1px solid var(--card-border)',
-        minWidth: 0,
-        overflow: 'hidden',
-      }}>
+      <div className={css.imageWrap}>
         <Image
           src={previewImage}
           alt={`${name} wall preview`}
           fill
           style={{ objectFit: 'contain' }}
-          sizes="60vw"
+          sizes="(max-width: 768px) 100vw, 60vw"
           priority={index === 0}
         />
         {/* Name overlay */}
@@ -58,14 +45,7 @@ export default function WallCard({ name, previewImage, downloadPath, noDownloadR
       </div>
 
       {/* Right panel */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '36px 32px',
-        gap: '20px',
-        minWidth: 0,
-      }}>
+      <div className={css.infoPanel}>
         <div>
           <span style={{
             fontFamily: 'var(--font-barlow), sans-serif',

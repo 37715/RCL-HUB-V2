@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from './Nav.module.css'
@@ -15,6 +15,12 @@ const NAV_LINKS = [
 export default function Nav() {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    const handler = () => setSidebarOpen(true)
+    window.addEventListener('rcl:openmenu', handler)
+    return () => window.removeEventListener('rcl:openmenu', handler)
+  }, [])
 
   return (
     <>

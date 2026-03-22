@@ -1,9 +1,22 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPlayerLeaderboardRow, getPlayerHistory } from '@/lib/rclApi'
 import MatchHistoryTable from './MatchHistoryTable'
 
 export const revalidate = 120
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const decoded = decodeURIComponent(params.username)
+  return {
+    title: decoded,
+    description: `${decoded}'s RCL player profile — ELO rating, win rate, match history, and season stats.`,
+    openGraph: {
+      title: `${decoded} | RCL Player Profile`,
+      description: `${decoded}'s RCL player profile — ELO rating, win rate, match history, and season stats.`,
+    },
+  }
+}
 
 interface Props {
   params: { username: string }

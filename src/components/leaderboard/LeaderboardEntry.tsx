@@ -149,14 +149,14 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
 
         {/* Col 5 — Last Active */}
         <div className={styles.dc}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--muted)', letterSpacing: 1 }}>
             {player.lastActive}
           </span>
         </div>
 
         {/* Col 6 — Matches */}
         <div className={styles.dc}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', letterSpacing: 1 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--muted)', letterSpacing: 1 }}>
             {player.matches} matches
           </span>
         </div>
@@ -178,6 +178,17 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
         <div className={styles.tierCell}>
           <Image src={RANK_IMAGES[player.tier]} alt={player.tier} width={30} height={30} style={{ objectFit: 'contain' }} />
           <span className={styles.tierName} style={{ color: tierColor }}>{player.tier}</span>
+        </div>
+
+        {/* Mobile-only row 2: K/D · matches · last active */}
+        <div className={styles.mobileRow2}>
+          <span style={{ color: player.kd > 0 ? kdColor : 'var(--muted)', fontWeight: 700 }}>
+            {player.kd > 0 ? player.kd.toFixed(2) : '—'} K/D
+          </span>
+          <span className={styles.mobileSep}>·</span>
+          <span>{player.matches} matches</span>
+          <span className={styles.mobileSep}>·</span>
+          <span>{player.lastActive}</span>
         </div>
       </div>
 

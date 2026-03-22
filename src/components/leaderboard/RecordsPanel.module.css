@@ -13,7 +13,7 @@
 .panel {
   width: min(98vw, 720px);
   max-height: min(calc(100vh - 104px), 820px);
-  background: #0d0d16;
+  background: #080810;
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -60,7 +60,7 @@
 
 .meta {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
   color: var(--muted);
   text-transform: uppercase;
@@ -101,7 +101,7 @@
 
 .tab {
   font-family: var(--font-barlow), sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -144,8 +144,8 @@
 /* ── List label ── */
 .listLabel {
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  color: rgba(240, 240, 240, 0.2);
+  font-size: 12px;
+  color: rgba(240, 240, 240, 0.5);
   letter-spacing: 1.5px;
   text-transform: uppercase;
   padding: 18px 32px 12px;
@@ -203,8 +203,8 @@
 
 .rowSub {
   font-family: var(--font-mono), monospace;
-  font-size: 9px;
-  color: rgba(240, 240, 240, 0.28);
+  font-size: 11px;
+  color: rgba(240, 240, 240, 0.55);
   letter-spacing: 0.5px;
 }
 
@@ -281,8 +281,8 @@
 
 .loadingText {
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  color: rgba(240, 240, 240, 0.25);
+  font-size: 12px;
+  color: rgba(240, 240, 240, 0.55);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -292,12 +292,27 @@
   padding: 60px 32px;
   text-align: center;
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  color: rgba(240, 240, 240, 0.2);
+  font-size: 13px;
+  color: rgba(240, 240, 240, 0.5);
   letter-spacing: 1px;
 }
 
 @media (max-width: 768px) {
+  .outer {
+    padding: 0;
+    align-items: flex-start;
+    z-index: 500;
+  }
+
+  .panel {
+    width: 100vw;
+    height: calc(100dvh - 64px - 56px);
+    max-height: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
   .row {
     grid-template-columns: 36px 1fr auto 26px;
     padding: 12px 16px;

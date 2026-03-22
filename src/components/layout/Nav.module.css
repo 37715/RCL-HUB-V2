@@ -140,6 +140,6 @@
 
 @media (max-width: 768px) {
   .brand { padding: 0 20px; font-size: 22px; }
-  .link { padding: 0 16px; font-size: 11px; letter-spacing: 2px; }
+  .links { display: none; }
   .menuBtn { padding: 0 20px; }
 }
