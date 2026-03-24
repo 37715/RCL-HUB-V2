@@ -5,6 +5,7 @@ import {
   getMatchDetails,
   getPlayerHistory,
   sanitizeName,
+  SEASON_CONFIG,
   type UiSeason,
   type PlayerHistoryMatch,
 } from '@/lib/rclApi'
@@ -162,11 +163,41 @@ async function computeRecords(season: UiSeason): Promise<RecordsData> {
       matches: r.matches, winRate: r.pos1Rate, elo: r.elo,
     }))
 
-  // 7. Fastest wins
-  const pages = await Promise.allSettled(
-    [1, 2, 3, 4, 5].map(p => getMatchHistory('tst', p))
-  )
-  const allMatches = pages.flatMap(r => (r.status === 'fulfilled' ? r.value : []))
+  // 7. Fastest wins — paginate through match history, filtered to this season
+  const cfg = SEASON_CONFIG[season]
+  const seasonStart = new Date(cfg.start).getTime()
+  const seasonEnd   = new Date(cfg.end).getTime() + 86_400_000 // inclusive end-of-day
+
+  function parseMatchDate(d: string): number {
+    const num = Number(d)
+    return !isNaN(num) && num > 1e9 ? num * 1000 : new Date(d).getTime()
+  }
+
+  const allMatches: Awaited<ReturnType<typeof getMatchHistory>> = []
+  let page = 1
+  const PARALLEL = 10
+  const MAX_PAGE = 200
+  let pastSeason = false
+  while (page <= MAX_PAGE && !pastSeason) {
+    const batch = Array.from(
+      { length: Math.min(PARALLEL, MAX_PAGE - page + 1) },
+      (_, i) => page + i,
+    )
+    const results = await Promise.allSettled(batch.map(p => getMatchHistory('tst', p)))
+    let anyData = false
+    for (const r of results) {
+      if (r.status === 'fulfilled' && r.value.length > 0) {
+        for (const m of r.value) {
+          const ts = parseMatchDate(m.date)
+          if (ts < seasonStart) { pastSeason = true; continue }
+          if (ts <= seasonEnd) allMatches.push(m)
+        }
+        anyData = true
+      }
+    }
+    if (!anyData) break
+    page += PARALLEL
+  }
   const top10Speed = allMatches
     .filter(m => m.totalTimeSeconds > 60)
     .sort((a, b) => a.totalTimeSeconds - b.totalTimeSeconds)

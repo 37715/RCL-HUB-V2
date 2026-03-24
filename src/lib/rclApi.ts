@@ -78,7 +78,7 @@ export interface PlayerProfileData {
 // ---------------------------------------------------------------------------
 // Season config
 // ---------------------------------------------------------------------------
-const SEASON_CONFIG: Record<UiSeason, { start: string; end: string; apiId: string }> = {
+export const SEASON_CONFIG: Record<UiSeason, { start: string; end: string; apiId: string }> = {
   1: { start: '2023-01-01', end: '2023-12-31', apiId: 'tst24' },
   2: { start: '2024-01-01', end: '2024-12-31', apiId: 'tst24' },
   3: { start: '2025-01-01', end: '2025-12-31', apiId: 'tst24' },

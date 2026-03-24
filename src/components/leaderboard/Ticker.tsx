@@ -9,7 +9,20 @@ interface TickerItem {
   up: boolean | null
 }
 
-function deriveItems(players: Player[]): TickerItem[] {
+interface RecordsData {
+  score: Array<{ username: string; score: number }>
+  kd: Array<{ username: string; bestKd: number; kills: number; deaths: number }>
+  streak: Array<{ username: string; maxStreak: number }>
+  speed: Array<{ duration: number; teams: string[][] }>
+}
+
+function fmtDuration(secs: number) {
+  const m = Math.floor(secs / 60)
+  const s = secs % 60
+  return `${m}m ${String(s).padStart(2, '0')}s`
+}
+
+function deriveItems(players: Player[], records: RecordsData | null): TickerItem[] {
   if (players.length === 0) return []
   const items: TickerItem[] = []
 
@@ -28,6 +41,25 @@ function deriveItems(players: Player[]): TickerItem[] {
   // Best win rate (min 10 matches)
   const topWr = [...players].filter(p => p.matches >= 10).sort((a, b) => b.winRate - a.winRate)[0]
   if (topWr) items.push({ text: `${topWr.username} highest win rate`, highlight: `${topWr.winRate.toFixed(1)}%`, up: true })
+
+  // Records — spliced in among the leaderboard stats
+  if (records) {
+    const r1 = records.score[0]
+    if (r1) items.push({ text: `${r1.username} record match score`, highlight: r1.score.toLocaleString(), up: null })
+
+    const r2 = records.kd[0]
+    if (r2) items.push({ text: `${r2.username} record match K/D`, highlight: `${r2.bestKd % 1 === 0 ? `${r2.bestKd}.00` : r2.bestKd.toFixed(2)} (${r2.kills}K/${r2.deaths}D)`, up: null })
+
+    const r3 = records.streak[0]
+    if (r3) items.push({ text: `${r3.username} longest win streak`, highlight: `${r3.maxStreak} wins`, up: true })
+
+    const r4 = records.speed[0]
+    if (r4) {
+      const winners = r4.teams[0] ?? []
+      const name = winners.length > 0 ? winners.join(' & ') : 'unknown'
+      items.push({ text: `${name} fastest win`, highlight: fmtDuration(r4.duration), up: null })
+    }
+  }
 
   // Most matches
   const topMatches = [...players].sort((a, b) => b.matches - a.matches)[0]
@@ -56,13 +88,19 @@ export default function Ticker() {
   const [items, setItems] = useState<TickerItem[]>([])
 
   useEffect(() => {
-    fetch('/api/leaderboard?mode=tst&season=4&region=combined&period=all')
+    const leaderboardP = fetch('/api/leaderboard?mode=tst&season=4&region=combined&period=all')
       .then(r => r.ok ? r.json() : [])
-      .then((players: Player[]) => {
-        const derived = deriveItems(Array.isArray(players) ? players : [])
-        if (derived.length > 0) setItems(derived)
-      })
-      .catch(() => {})
+      .then((d: Player[]) => (Array.isArray(d) ? d : []))
+      .catch(() => [] as Player[])
+
+    const recordsP = fetch('/api/records?season=4')
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null)
+
+    Promise.all([leaderboardP, recordsP]).then(([players, records]) => {
+      const derived = deriveItems(players, records as RecordsData | null)
+      if (derived.length > 0) setItems(derived)
+    })
   }, [])
 
   if (items.length === 0) return (
