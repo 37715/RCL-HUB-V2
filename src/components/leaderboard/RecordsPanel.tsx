@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
-import type { Player, Season, Tier } from '@/types'
-import type { PlayerHistoryMatch } from '@/lib/rclApi'
+import type { Season, Tier } from '@/types'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { PLAYER_FLAGS } from '@/data/flags'
 import styles from './RecordsPanel.module.css'
@@ -45,33 +44,16 @@ const RANK_IMAGES: Record<Tier, string> = {
 const MEDAL_COLORS = ['#e8ff47', '#b0bec5', '#cd7f32']
 const PLAYBACK_BASE = 'https://www.armanelgtron.tk/playback/?id='
 
-interface FastMatch {
-  id: string
-  date: string
-  duration: number
-  teams: string[][]
-}
-
-interface StreakResult {
-  username: string
-  tier: Tier
-  maxStreak: number
-}
-
-interface MatchKdResult {
-  username: string
-  tier: Tier
-  bestKd: number
-  kills: number
-  deaths: number
-  matchId: string
-}
-
-interface MatchScoreResult {
-  username: string
-  tier: Tier
-  score: number
-  matchId: string
+// ---------------------------------------------------------------------------
+// Types matching the /api/records response
+// ---------------------------------------------------------------------------
+interface RecordsData {
+  score: Array<{ username: string; tier: Tier; matches: number; winRate: number; score: number; matchId: string }>
+  kd: Array<{ username: string; tier: Tier; matches: number; winRate: number; bestKd: number; kills: number; deaths: number; matchId: string }>
+  streak: Array<{ username: string; tier: Tier; matches: number; winRate: number; maxStreak: number }>
+  addict: Array<{ username: string; tier: Tier; matches: number; winRate: number; elo: number }>
+  speed: Array<{ id: string; date: string; duration: number; teams: string[][] }>
+  computedAt: number
 }
 
 interface Props {
@@ -80,36 +62,9 @@ interface Props {
   onClose: () => void
 }
 
-function computeMaxStreak(matches: PlayerHistoryMatch[]): number {
-  const sorted = [...matches].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  )
-  let max = 0, cur = 0
-  for (const m of sorted) {
-    if (m.teamPlace === 1) { cur++; max = Math.max(max, cur) }
-    else cur = 0
-  }
-  return max
-}
-
-function computeBestMatchKd(matches: PlayerHistoryMatch[]): { kd: number; kills: number; deaths: number; matchId: string } {
-  let best = { kd: 0, kills: 0, deaths: 0, matchId: '' }
-  for (const m of matches) {
-    if (m.kills === 0 && m.deaths === 0) continue
-    const kd = m.deaths === 0 ? m.kills : m.kills / m.deaths
-    if (kd > best.kd) best = { kd, kills: m.kills, deaths: m.deaths, matchId: m.matchId }
-  }
-  return best
-}
-
-function computeBestMatchScore(matches: PlayerHistoryMatch[]): { score: number; matchId: string } {
-  let best = { score: 0, matchId: '' }
-  for (const m of matches) {
-    if (m.score > best.score) best = { score: m.score, matchId: m.matchId }
-  }
-  return best
-}
-
+// ---------------------------------------------------------------------------
+// Formatting helpers
+// ---------------------------------------------------------------------------
 function fmtDuration(secs: number) {
   const m = Math.floor(secs / 60)
   const s = secs % 60
@@ -130,6 +85,9 @@ function valueShadow(rank: number) {
   return rank === 1 ? '0 0 20px rgba(232,255,71,0.35)' : 'none'
 }
 
+// ---------------------------------------------------------------------------
+// Presentational sub-components
+// ---------------------------------------------------------------------------
 function RankNum({ n }: { n: number }) {
   const color = n <= 3 ? MEDAL_COLORS[n - 1] : 'rgba(240,240,240,0.2)'
   return (
@@ -159,16 +117,16 @@ function ReplayLink({ matchId }: { matchId: string }) {
 }
 
 function PlayerRow({
-  rank, player, value, sub, matchId,
-}: { rank: number; player: Player; value: string; sub?: string; matchId?: string }) {
-  const flagCode = getFlagCode(player.username)
+  rank, username, tier, value, sub, matchId,
+}: { rank: number; username: string; tier: Tier; value: string; sub?: string; matchId?: string }) {
+  const flagCode = getFlagCode(username)
   return (
     <div className={styles.row}>
       <RankNum n={rank} />
       <div className={styles.rowInfo}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {flagCode && <FlagIcon code={flagCode} />}
-          <span className={styles.rowName}>{player.username}</span>
+          <span className={styles.rowName}>{username}</span>
         </div>
         {sub && <span className={styles.rowSub}>{sub}</span>}
       </div>
@@ -176,10 +134,10 @@ function PlayerRow({
         {value}
       </span>
       {matchId ? <ReplayLink matchId={matchId} /> : <div className={styles.rowBadge}>
-        <Image src={RANK_IMAGES[player.tier]} alt={player.tier} width={28} height={28} />
+        <Image src={RANK_IMAGES[tier]} alt={tier} width={28} height={28} />
       </div>}
       {matchId && <div className={styles.rowBadge}>
-        <Image src={RANK_IMAGES[player.tier]} alt={player.tier} width={28} height={28} />
+        <Image src={RANK_IMAGES[tier]} alt={tier} width={28} height={28} />
       </div>}
     </div>
   )
@@ -203,7 +161,7 @@ function PlayerNames({ names }: { names: string[] }) {
   )
 }
 
-function SpeedRow({ rank, match }: { rank: number; match: FastMatch }) {
+function SpeedRow({ rank, match }: { rank: number; match: RecordsData['speed'][0] }) {
   const winners = match.teams[0] ?? []
   const losers  = match.teams[1] ?? []
   const losersStr  = losers.length  ? losers.join(' & ')  : '—'
@@ -227,55 +185,39 @@ function Loading() {
   return (
     <div className={styles.loading}>
       <div className={styles.loadingDots}><span /><span /><span /></div>
-      <span className={styles.loadingText}>computing records</span>
+      <span className={styles.loadingText}>loading records</span>
     </div>
   )
 }
 
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 export default function RecordsPanel({ season, isOpen, onClose }: Props) {
   const [category, setCategory] = useState<Category>('score')
-
-  // Always fetch season-wide players (period=all) regardless of the leaderboard's current filter
-  const [allPlayers, setAllPlayers] = useState<Player[]>([])
-  const [allPlayersFetched, setAllPlayersFetched] = useState(false)
-
-  const [fastMatches, setFastMatches] = useState<FastMatch[]>([])
-  const [fastLoading, setFastLoading] = useState(false)
-  const [fastFetched, setFastFetched] = useState(false)
-
-  const [streaks, setStreaks] = useState<StreakResult[]>([])
-  const [streakLoading, setStreakLoading] = useState(false)
-  const [streakFetched, setStreakFetched] = useState(false)
-
-  const [matchKds, setMatchKds] = useState<MatchKdResult[]>([])
-  const [matchKdLoading, setMatchKdLoading] = useState(false)
-  const [matchKdFetched, setMatchKdFetched] = useState(false)
-
-  const [matchScores, setMatchScores] = useState<MatchScoreResult[]>([])
-  const [matchScoreLoading, setMatchScoreLoading] = useState(false)
-  const [matchScoreFetched, setMatchScoreFetched] = useState(false)
+  const [records, setRecords] = useState<RecordsData | null>(null)
+  const [loading, setLoading] = useState(false)
+  const lastFetch = useRef<{ season: Season; time: number }>({ season: 0 as Season, time: 0 })
 
   useEffect(() => {
     if (!isOpen) {
-      setAllPlayersFetched(false); setAllPlayers([])
-      setFastFetched(false); setFastMatches([])
-      setStreakFetched(false); setStreaks([])
-      setMatchKdFetched(false); setMatchKds([])
-      setMatchScoreFetched(false); setMatchScores([])
       setCategory('score')
+      return
     }
-  }, [isOpen])
 
-  // Fetch all-season players when panel opens
-  useEffect(() => {
-    if (!isOpen || allPlayersFetched) return
-    setAllPlayersFetched(true)
-    const params = new URLSearchParams({ mode: 'tst', season: String(season), region: 'combined', period: 'all' })
-    fetch(`/api/leaderboard?${params}`)
-      .then((r) => r.json())
-      .then((d: Player[]) => setAllPlayers(Array.isArray(d) ? d : []))
-      .catch(() => setAllPlayers([]))
-  }, [isOpen, allPlayersFetched, season])
+    const { season: prevSeason, time } = lastFetch.current
+    if (prevSeason === season && records && Date.now() - time < 5 * 60 * 1000) return
+
+    setLoading(true)
+    fetch(`/api/records?season=${season}`)
+      .then(r => r.json())
+      .then((data: RecordsData) => {
+        setRecords(data)
+        lastFetch.current = { season, time: Date.now() }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [isOpen, season]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isOpen) return
@@ -283,84 +225,6 @@ export default function RecordsPanel({ season, isOpen, onClose }: Props) {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
-
-  // Fetch fastest matches (with player names)
-  useEffect(() => {
-    if (category !== 'speed' || !isOpen || fastFetched) return
-    setFastLoading(true); setFastFetched(true)
-    fetch('/api/records')
-      .then((r) => r.json())
-      .then((d) => setFastMatches(d.fastest ?? []))
-      .catch(() => setFastMatches([]))
-      .finally(() => setFastLoading(false))
-  }, [category, isOpen, fastFetched])
-
-  // Win streaks
-  useEffect(() => {
-    if (category !== 'streak' || !isOpen || streakFetched || !allPlayers.length) return
-    setStreakLoading(true); setStreakFetched(true)
-    const top = [...allPlayers].filter((p) => p.matches >= 10).sort((a, b) => b.winRate - a.winRate).slice(0, 20)
-    Promise.all(
-      top.map((p) =>
-        fetch(`/api/player/history?username=${encodeURIComponent(p.username)}&season=${season}`)
-          .then((r) => r.json())
-          .then((h: PlayerHistoryMatch[]) => ({ username: p.username, tier: p.tier, maxStreak: computeMaxStreak(h) }))
-          .catch(() => ({ username: p.username, tier: p.tier, maxStreak: 0 }))
-      )
-    ).then((res) => {
-      setStreaks(res.filter((r) => r.maxStreak > 0).sort((a, b) => b.maxStreak - a.maxStreak))
-      setStreakLoading(false)
-    })
-  }, [category, isOpen, streakFetched, allPlayers, season])
-
-  // Best single-match K/D
-  useEffect(() => {
-    if (category !== 'kd' || !isOpen || matchKdFetched || !allPlayers.length) return
-    setMatchKdLoading(true); setMatchKdFetched(true)
-    const top = [...allPlayers].filter((p) => p.matches >= 10).sort((a, b) => b.kd - a.kd).slice(0, 30)
-    Promise.all(
-      top.map((p) =>
-        fetch(`/api/player/history?username=${encodeURIComponent(p.username)}&season=${season}`)
-          .then((r) => r.json())
-          .then((h: PlayerHistoryMatch[]) => {
-            const best = computeBestMatchKd(h)
-            return { username: p.username, tier: p.tier, bestKd: best.kd, kills: best.kills, deaths: best.deaths, matchId: best.matchId }
-          })
-          .catch(() => ({ username: p.username, tier: p.tier, bestKd: 0, kills: 0, deaths: 0, matchId: '' }))
-      )
-    ).then((res) => {
-      setMatchKds(res.filter((r) => r.bestKd > 0).sort((a, b) => b.bestKd - a.bestKd).slice(0, 10))
-      setMatchKdLoading(false)
-    })
-  }, [category, isOpen, matchKdFetched, allPlayers, season])
-
-  // Best single-match score (fetched so we have matchId)
-  useEffect(() => {
-    if (category !== 'score' || !isOpen || matchScoreFetched || !allPlayers.length) return
-    setMatchScoreLoading(true); setMatchScoreFetched(true)
-    const top = [...allPlayers].sort((a, b) => b.highScore - a.highScore).slice(0, 20)
-    Promise.all(
-      top.map((p) =>
-        fetch(`/api/player/history?username=${encodeURIComponent(p.username)}&season=${season}`)
-          .then((r) => r.json())
-          .then((h: PlayerHistoryMatch[]) => {
-            const best = computeBestMatchScore(h)
-            return { username: p.username, tier: p.tier, score: best.score || p.highScore, matchId: best.matchId }
-          })
-          .catch(() => ({ username: p.username, tier: p.tier, score: p.highScore, matchId: '' }))
-      )
-    ).then((res) => {
-      setMatchScores(res.filter((r) => r.score > 0).sort((a, b) => b.score - a.score).slice(0, 10))
-      setMatchScoreLoading(false)
-    })
-  }, [category, isOpen, matchScoreFetched, allPlayers, season])
-
-  const addictRecords = useMemo(
-    () => [...allPlayers].sort((a, b) => b.matches - a.matches).slice(0, 10),
-    [allPlayers]
-  )
-
-  const playerFor = (username: string) => allPlayers.find((p) => p.username === username)
 
   return (
     <AnimatePresence>
@@ -407,71 +271,65 @@ export default function RecordsPanel({ season, isOpen, onClose }: Props) {
                   transition={{ duration: 0.18 }}
                   className={styles.list}
                 >
-                  {category === 'score' && (
+                  {loading && <Loading />}
+
+                  {!loading && category === 'score' && (
                     <>
                       <div className={styles.listLabel}>highest single-match score</div>
-                      {matchScoreLoading ? <Loading /> : matchScores.map((r, i) => {
-                        const p = playerFor(r.username)
-                        if (!p) return null
-                        return (
-                          <PlayerRow key={r.username} rank={i + 1} player={p}
-                            value={r.score.toLocaleString()}
-                            sub={`${p.matches} matches · ${p.winRate.toFixed(1)}% wr`}
-                            matchId={r.matchId} />
-                        )
-                      })}
+                      {(records?.score ?? []).map((r, i) => (
+                        <PlayerRow key={r.username} rank={i + 1}
+                          username={r.username} tier={r.tier}
+                          value={r.score.toLocaleString()}
+                          sub={`${r.matches} matches · ${r.winRate.toFixed(1)}% wr`}
+                          matchId={r.matchId} />
+                      ))}
                     </>
                   )}
 
-                  {category === 'kd' && (
+                  {!loading && category === 'kd' && (
                     <>
                       <div className={styles.listLabel}>best k/d ratio in a single match</div>
-                      {matchKdLoading ? <Loading /> : matchKds.map((r, i) => {
-                        const p = playerFor(r.username)
-                        if (!p) return null
-                        return (
-                          <PlayerRow key={r.username} rank={i + 1} player={p}
-                            value={r.bestKd % 1 === 0 ? `${r.bestKd}.00` : r.bestKd.toFixed(2)}
-                            sub={`${r.kills}K / ${r.deaths}D`}
-                            matchId={r.matchId} />
-                        )
-                      })}
+                      {(records?.kd ?? []).map((r, i) => (
+                        <PlayerRow key={r.username} rank={i + 1}
+                          username={r.username} tier={r.tier}
+                          value={r.bestKd % 1 === 0 ? `${r.bestKd}.00` : r.bestKd.toFixed(2)}
+                          sub={`${r.kills}K / ${r.deaths}D`}
+                          matchId={r.matchId} />
+                      ))}
                     </>
                   )}
 
-                  {category === 'streak' && (
+                  {!loading && category === 'streak' && (
                     <>
                       <div className={styles.listLabel}>longest win streak ever recorded</div>
-                      {streakLoading ? <Loading /> : streaks.slice(0, 10).map((s, i) => {
-                        const p = playerFor(s.username)
-                        if (!p) return null
-                        return (
-                          <PlayerRow key={s.username} rank={i + 1} player={p}
-                            value={`${s.maxStreak}W`}
-                            sub={`${p.matches} matches · ${p.winRate.toFixed(1)}% wr`} />
-                        )
-                      })}
+                      {(records?.streak ?? []).map((s, i) => (
+                        <PlayerRow key={s.username} rank={i + 1}
+                          username={s.username} tier={s.tier}
+                          value={`${s.maxStreak}W`}
+                          sub={`${s.matches} matches · ${s.winRate.toFixed(1)}% wr`} />
+                      ))}
                     </>
                   )}
 
-                  {category === 'addict' && (
+                  {!loading && category === 'addict' && (
                     <>
                       <div className={styles.listLabel}>most matches played</div>
-                      {addictRecords.map((p, i) => (
-                        <PlayerRow key={p.username} rank={i + 1} player={p}
+                      {(records?.addict ?? []).map((p, i) => (
+                        <PlayerRow key={p.username} rank={i + 1}
+                          username={p.username} tier={p.tier}
                           value={p.matches.toLocaleString()}
                           sub={`${p.winRate.toFixed(1)}% win rate · elo ${p.elo}`} />
                       ))}
                     </>
                   )}
 
-                  {category === 'speed' && (
+                  {!loading && category === 'speed' && (
                     <>
                       <div className={styles.listLabel}>shortest match duration</div>
-                      {fastLoading ? <Loading /> : fastMatches.map((m, i) => (
+                      {(records?.speed ?? []).map((m, i) => (
                         <SpeedRow key={m.id || i} rank={i + 1} match={m} />
                       ))}
-                      {!fastLoading && fastMatches.length === 0 && (
+                      {(records?.speed ?? []).length === 0 && (
                         <div className={styles.empty}>no match data available</div>
                       )}
                     </>
