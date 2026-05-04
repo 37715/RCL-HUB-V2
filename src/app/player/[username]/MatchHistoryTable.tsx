@@ -4,8 +4,16 @@ import React, { useState, useEffect } from 'react'
 import type { PlayerHistoryMatch } from '@/lib/rclApi'
 import styles from './MatchHistoryTable.module.css'
 
-type SortKey = 'date' | 'teamPlace' | 'place' | 'score' | 'kd' | 'change'
+type SortKey = 'date' | 'teamPlace' | 'place' | 'score' | 'kd' | 'change' | 'avgElo'
 type SortDir = 'asc' | 'desc'
+
+function eloColor(elo: number): string {
+  if (elo >= 2200) return '#ff9aff' // amethyst/master — very strong lobby
+  if (elo >= 2000) return '#6ddcff' // diamond — strong
+  if (elo >= 1800) return '#e8ff47' // platinum — above average
+  if (elo >= 1600) return '#a9ffb0' // gold — average
+  return 'var(--muted)'              // below average
+}
 
 function placeLabel(place: number): string {
   if (place === 1) return '1st'
@@ -43,6 +51,7 @@ function sortMatches(matches: PlayerHistoryMatch[], key: SortKey, dir: SortDir):
       case 'score':     av = a.score;                    bv = b.score;                    break
       case 'kd':        av = parseFloat(a.kd) || 0;     bv = parseFloat(b.kd) || 0;     break
       case 'change':    av = parseFloat(a.change) || 0; bv = parseFloat(b.change) || 0; break
+      case 'avgElo':    av = a.lobbyAvgElo || -1;        bv = b.lobbyAvgElo || -1;        break
     }
     return dir === 'asc' ? av - bv : bv - av
   })
@@ -72,7 +81,11 @@ function ColHeader({ label, sortKey, active, dir, align = 'left', onSort }: {
   )
 }
 
-export default function MatchHistoryTable({ history }: { history: PlayerHistoryMatch[] }) {
+interface Props {
+  history: PlayerHistoryMatch[]
+}
+
+export default function MatchHistoryTable({ history }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [isMobile, setIsMobile] = useState(false)
@@ -106,11 +119,15 @@ export default function MatchHistoryTable({ history }: { history: PlayerHistoryM
                 {match.teamPlace > 0 ? placeLabel(match.teamPlace) : '—'}
               </span>
               <span style={{ color: 'var(--card-border)' }}>·</span>
-              <span className={styles.cardStat} style={{ color: placeColor(match.place) }}>
-                {match.place > 0 ? placeLabel(match.place) : '—'}
-              </span>
-              <span style={{ color: 'var(--card-border)' }}>·</span>
               <span className={styles.cardStat}>{match.kd} kd</span>
+              {match.lobbyAvgElo > 0 && (
+                <>
+                  <span style={{ color: 'var(--card-border)' }}>·</span>
+                  <span className={styles.cardStat} style={{ color: eloColor(match.lobbyAvgElo) }}>
+                    lobby {match.lobbyAvgElo}
+                  </span>
+                </>
+              )}
             </div>
             <span className={styles.cardDelta} style={{ color: ratingColor(match.change) }}>
               {match.change}
@@ -135,6 +152,7 @@ export default function MatchHistoryTable({ history }: { history: PlayerHistoryM
         <ColHeader label="Indv" sortKey="place" active={sortKey} dir={sortDir} align="center" onSort={handleSort} />
         <ColHeader label="Score" sortKey="score" active={sortKey} dir={sortDir} align="right" onSort={handleSort} />
         <ColHeader label="K/D" sortKey="kd" active={sortKey} dir={sortDir} align="right" onSort={handleSort} />
+        <ColHeader label="Lobby ELO" sortKey="avgElo" active={sortKey} dir={sortDir} align="right" onSort={handleSort} />
         <ColHeader label="Rating Δ" sortKey="change" active={sortKey} dir={sortDir} align="right" onSort={handleSort} />
       </div>
       {sorted.slice(0, 20).map((match, i) => (
@@ -149,6 +167,9 @@ export default function MatchHistoryTable({ history }: { history: PlayerHistoryM
           </span>
           <span style={{ textAlign: 'right' }}>{match.score > 0 ? match.score.toLocaleString() : '—'}</span>
           <span style={{ textAlign: 'right' }}>{match.kd}</span>
+          <span style={{ textAlign: 'right', color: match.lobbyAvgElo > 0 ? eloColor(match.lobbyAvgElo) : 'var(--muted)' }}>
+            {match.lobbyAvgElo > 0 ? match.lobbyAvgElo.toLocaleString() : '—'}
+          </span>
           <span style={{ textAlign: 'right', color: ratingColor(match.change) }}>{match.change}</span>
         </div>
       ))}

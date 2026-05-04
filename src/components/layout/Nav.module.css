@@ -90,6 +90,74 @@
   right: 0;
 }
 
+/* ── Featured "Tronnies" pill ── */
+.featured {
+  color: #ffb4d9;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 72, 153, 0.10) 0%,
+    rgba(168, 85, 247, 0.08) 100%
+  );
+  text-shadow: 0 0 18px rgba(236, 72, 153, 0.4);
+  position: relative;
+}
+
+.featured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(236, 72, 153, 0.12) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: featuredShimmer 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.featured::after {
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.7);
+}
+
+.featured:hover {
+  color: #ffd4e8;
+  text-shadow: 0 0 24px rgba(236, 72, 153, 0.65);
+}
+
+.featuredActive {
+  color: #ffd4e8;
+}
+
+.featuredActive::after {
+  left: 0;
+  right: 0;
+}
+
+.featuredDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ec4899;
+  margin-right: 10px;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.8), 0 0 18px rgba(236, 72, 153, 0.4);
+  animation: featuredPulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes featuredShimmer {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+@keyframes featuredPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+
 /* ── Menu button — pushed to far right ── */
 .menuBtn {
   display: flex;

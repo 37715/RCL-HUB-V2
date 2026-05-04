@@ -133,11 +133,19 @@ export default async function PlayerProfilePage({ params }: Props) {
   const row = leaderboardRow.status === 'fulfilled' ? leaderboardRow.value : null
   const history = historyMatches.status === 'fulfilled' ? historyMatches.value : []
 
+  // Lobby ELO (avg entry rating of all match participants) is embedded in each
+  // history match already — average across the recent matches shown in the table.
+  const lobbyElos = history.slice(0, 20).map((m) => m.lobbyAvgElo).filter((v) => v > 0)
+  const avgOfAvgs = lobbyElos.length > 0
+    ? Math.round(lobbyElos.reduce((a, b) => a + b, 0) / lobbyElos.length)
+    : null
+
   const statCards = [
     { label: 'ELO Rating', value: row ? row.elo.toLocaleString() : '—' },
     { label: 'Rank', value: row ? `#${row.rank}` : '—' },
     { label: 'Win Rate', value: row ? `${row.pos1Rate.toFixed(1)}%` : '—' },
     { label: 'Matches', value: row ? (row.matches > 0 ? String(row.matches) : '—') : '—' },
+    { label: 'Avg Match ELO', value: avgOfAvgs != null ? avgOfAvgs.toLocaleString() : '—' },
   ]
 
   return (

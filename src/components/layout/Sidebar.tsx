@@ -24,25 +24,31 @@ type SidebarItem =
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     num: '01',
+    label: 'tronnies',
+    desc: 'the 2025 rewind — awards voted by players, remembered by everyone.',
+    href: '/tronnies',
+  },
+  {
+    num: '02',
     label: 'account',
     desc: 'manage your rcl profile, stats, and account settings.',
     href: 'https://retrocyclesleague.com/',
     external: true,
   },
   {
-    num: '02',
+    num: '03',
     label: 'settings',
     desc: 'manage your account, preferences, and display options.',
     href: '/settings',
   },
   {
-    num: '03',
+    num: '04',
     label: 'about',
     desc: 'what is rcl and where is it going.',
     href: '/about',
   },
   {
-    num: '04',
+    num: '05',
     label: 'support',
     desc: 'for help or questions, reach out on discord. contact vllis or syn_acc.',
     href: '/support',

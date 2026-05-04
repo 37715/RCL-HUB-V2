@@ -470,6 +470,34 @@
   white-space: nowrap;
 }
 
+.sortableTh {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.sortableTh:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sortableThActive {
+  color: var(--text);
+}
+
+.sortLabel {
+  display: inline-block;
+}
+
+.sortArrow {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 8px;
+  letter-spacing: 0;
+  opacity: 0.8;
+  width: 8px;
+}
+
 .table td {
   padding: 10px 12px;
   font-size: 13px;
@@ -571,12 +599,12 @@
   /* Hide less critical columns: Teammate, Played%, Alive%, Score */
   .table th:nth-child(2),
   .table td:nth-child(2),
-  .table th:nth-child(7),
-  .table td:nth-child(7),
   .table th:nth-child(8),
   .table td:nth-child(8),
   .table th:nth-child(9),
-  .table td:nth-child(9) {
+  .table td:nth-child(9),
+  .table th:nth-child(10),
+  .table td:nth-child(10) {
     display: none;
   }
 

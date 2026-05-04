@@ -7,6 +7,14 @@ import type { Player, Season, Tier } from '@/types'
 import type { PlayerHistoryMatch } from '@/lib/rclApi'
 import styles from './AdvancedStatsPanel.module.css'
 
+function lobbyColor(elo: number): string {
+  if (elo >= 2200) return '#ff9aff'
+  if (elo >= 2000) return '#6ddcff'
+  if (elo >= 1800) return '#e8ff47'
+  if (elo >= 1600) return '#a9ffb0'
+  return 'var(--muted)'
+}
+
 interface Props {
   player: Player | null
   rank: number | null
@@ -113,11 +121,76 @@ function StatBar({ label, value, display, color }: { label: string; value: numbe
 
 // ── Match history table ───────────────────────────────────
 
+type SortKey =
+  | 'date' | 'teammate' | 'exit' | 'lobby' | 'change'
+  | 'team' | 'indv' | 'played' | 'alive' | 'score' | 'kd'
+type SortDir = 'asc' | 'desc'
+
+function parseDate(d: string): number {
+  const num = Number(d)
+  if (!isNaN(num) && num > 1e9) return num * 1000
+  const t = new Date(d).getTime()
+  return isNaN(t) ? 0 : t
+}
+
+function sortValue(m: PlayerHistoryMatch, key: SortKey): number | string {
+  switch (key) {
+    case 'date':     return parseDate(m.date)
+    case 'teammate': return (m.teammates[0] || '').toLowerCase()
+    case 'exit':     return m.exitRating || 0
+    case 'lobby':    return m.lobbyAvgElo || 0
+    case 'change':   return parseFloat(m.change) || 0
+    case 'team':     return m.teamPlace || 999
+    case 'indv':     return m.place || 999
+    case 'played':   return m.playedPct || 0
+    case 'alive':    return m.alivePct || 0
+    case 'score':    return m.score || 0
+    case 'kd':       return parseFloat(m.kd) || 0
+  }
+}
+
 function MatchTable({ matches }: { matches: PlayerHistoryMatch[] }) {
   const [page, setPage] = useState(0)
+  const [sortKey, setSortKey] = useState<SortKey>('date')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
   const pageSize = 10
-  const totalPages = Math.max(1, Math.ceil(matches.length / pageSize))
-  const visible = matches.slice(page * pageSize, page * pageSize + pageSize)
+
+  const sorted = [...matches].sort((a, b) => {
+    const av = sortValue(a, sortKey)
+    const bv = sortValue(b, sortKey)
+    const cmp = typeof av === 'string' && typeof bv === 'string'
+      ? av.localeCompare(bv)
+      : (av as number) - (bv as number)
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize))
+  const visible = sorted.slice(page * pageSize, page * pageSize + pageSize)
+
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      // First click on a numeric/date column sorts desc (biggest first);
+      // teammate (string) starts ascending.
+      setSortDir(key === 'teammate' ? 'asc' : 'desc')
+    }
+    setPage(0)
+  }
+
+  function SortTh({ label, keyName }: { label: string; keyName: SortKey }) {
+    const active = sortKey === keyName
+    const arrow = active ? (sortDir === 'asc' ? '▲' : '▼') : ''
+    return (
+      <th
+        onClick={() => handleSort(keyName)}
+        className={`${styles.sortableTh} ${active ? styles.sortableThActive : ''}`}
+      >
+        <span className={styles.sortLabel}>{label}</span>
+        <span className={styles.sortArrow}>{arrow}</span>
+      </th>
+    )
+  }
 
   function fmtDate(d: string) {
     const num = Number(d)
@@ -144,16 +217,17 @@ function MatchTable({ matches }: { matches: PlayerHistoryMatch[] }) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Match</th>
-              <th>Teammate</th>
-              <th>Exit ELO</th>
-              <th>Change</th>
-              <th>Team</th>
-              <th>Indv</th>
-              <th>Played%</th>
-              <th>Alive%</th>
-              <th>Score</th>
-              <th>K/D</th>
+              <SortTh label="Match"     keyName="date" />
+              <SortTh label="Teammate"  keyName="teammate" />
+              <SortTh label="Exit ELO"  keyName="exit" />
+              <SortTh label="Lobby ELO" keyName="lobby" />
+              <SortTh label="Change"    keyName="change" />
+              <SortTh label="Team"      keyName="team" />
+              <SortTh label="Indv"      keyName="indv" />
+              <SortTh label="Played%"   keyName="played" />
+              <SortTh label="Alive%"    keyName="alive" />
+              <SortTh label="Score"     keyName="score" />
+              <SortTh label="K/D"       keyName="kd" />
             </tr>
           </thead>
           <tbody>
@@ -162,6 +236,9 @@ function MatchTable({ matches }: { matches: PlayerHistoryMatch[] }) {
                 <td className={styles.tdDate}>{fmtDate(m.date)}</td>
                 <td className={styles.tdTeammate}>{m.teammates.join(', ') || '—'}</td>
                 <td>{m.exitRating}</td>
+                <td style={{ color: m.lobbyAvgElo > 0 ? lobbyColor(m.lobbyAvgElo) : 'var(--muted)', fontWeight: 700 }}>
+                  {m.lobbyAvgElo > 0 ? m.lobbyAvgElo.toLocaleString() : '—'}
+                </td>
                 <td style={{ color: changeColor(m.change), fontWeight: 700 }}>{m.change}</td>
                 <td>{m.teamPlace || '—'}</td>
                 <td>{m.place || '—'}</td>
@@ -213,6 +290,11 @@ export default function AdvancedStatsPanel({ player, rank, season, isOpen, onClo
 
   const avgAlivePct = history.length > 0
     ? Math.round(history.reduce((s, m) => s + m.alivePct, 0) / history.length)
+    : null
+
+  const eloVals = history.map((m) => m.lobbyAvgElo).filter((v) => v > 0)
+  const avgLobbyElo = eloVals.length > 0
+    ? Math.round(eloVals.reduce((a, b) => a + b, 0) / eloVals.length)
     : null
 
   return (
@@ -272,6 +354,12 @@ export default function AdvancedStatsPanel({ player, rank, season, isOpen, onClo
                     value={avgAlivePct ?? 0}
                     display={avgAlivePct != null ? `${avgAlivePct}%` : '—'}
                     color={avgAlivePct != null ? (avgAlivePct >= 70 ? '#4eff91' : avgAlivePct >= 50 ? '#ffe94e' : '#ff3d6e') : 'rgba(255,255,255,0.15)'}
+                  />
+                  <StatBar
+                    label="Avg Lobby ELO"
+                    value={avgLobbyElo != null ? ((avgLobbyElo - 1400) / 1000) * 100 : 0}
+                    display={avgLobbyElo != null ? avgLobbyElo.toLocaleString() : '—'}
+                    color={avgLobbyElo != null ? lobbyColor(avgLobbyElo) : 'rgba(255,255,255,0.15)'}
                   />
                 </div>
 

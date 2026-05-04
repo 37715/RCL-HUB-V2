@@ -73,12 +73,18 @@ interface AddictRecord {
 interface SpeedRecord {
   id: string; date: string; duration: number; teams: string[][]
 }
+interface HoursRecord {
+  username: string; tier: Tier; matches: number; seconds: number
+}
 interface RecordsData {
   score: ScoreRecord[]
   kd: KdRecord[]
   streak: StreakRecord[]
   addict: AddictRecord[]
   speed: SpeedRecord[]
+  totalMatches: number
+  totalSeconds: number
+  hours: HoursRecord[]
   computedAt: number
 }
 
@@ -221,7 +227,41 @@ async function computeRecords(season: UiSeason): Promise<RecordsData> {
     return { id: m.id, date: m.date, duration: m.totalTimeSeconds, teams }
   })
 
-  return { score, kd, streak, addict, speed, computedAt: Date.now() }
+  // 8. Aggregate season totals + per-player time played
+  const totalMatches = allMatches.length
+  const totalSeconds = allMatches.reduce((s, m) => s + (m.totalTimeSeconds || 0), 0)
+
+  const matchDurationById = new Map<string, number>()
+  for (const m of allMatches) matchDurationById.set(m.id, m.totalTimeSeconds || 0)
+
+  const hours: HoursRecord[] = playerNames
+    .map(name => {
+      const info = playerInfo.get(name)!
+      const hist = histories.get(name) ?? []
+      let secs = 0
+      for (const h of hist) {
+        const dur = matchDurationById.get(h.matchId)
+        if (typeof dur === 'number' && dur > 0) {
+          // playedPct is 0-100; treat as fraction of match they were active
+          secs += dur * (Math.max(0, Math.min(100, h.playedPct)) / 100)
+        }
+      }
+      return {
+        username: name,
+        tier: getTier(info.elo),
+        matches: info.matches,
+        seconds: Math.round(secs),
+      }
+    })
+    .filter(r => r.seconds > 0)
+    .sort((a, b) => b.seconds - a.seconds)
+    .slice(0, 5)
+
+  return {
+    score, kd, streak, addict, speed,
+    totalMatches, totalSeconds, hours,
+    computedAt: Date.now(),
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -250,7 +290,11 @@ export async function GET(req: NextRequest) {
     console.error('[/api/records]', err)
     if (cached) return NextResponse.json(cached.data)
     return NextResponse.json(
-      { score: [], kd: [], streak: [], addict: [], speed: [], computedAt: 0 },
+      {
+        score: [], kd: [], streak: [], addict: [], speed: [],
+        totalMatches: 0, totalSeconds: 0, hours: [],
+        computedAt: 0,
+      },
       { status: 502 },
     )
   } finally {

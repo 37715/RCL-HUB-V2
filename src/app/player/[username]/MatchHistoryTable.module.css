@@ -1,8 +1,8 @@
 /* ── Desktop grid ── */
 .header {
   display: grid;
-  grid-template-columns: 36px 1fr 70px 70px 80px 80px 100px;
-  gap: 16px;
+  grid-template-columns: 36px 1fr 64px 64px 80px 70px 90px 90px;
+  gap: 14px;
   padding: 6px 20px;
   font-family: var(--font-barlow), sans-serif;
   font-size: 9px;
@@ -15,9 +15,9 @@
 
 .row {
   display: grid;
-  grid-template-columns: 36px 1fr 70px 70px 80px 80px 100px;
+  grid-template-columns: 36px 1fr 64px 64px 80px 70px 90px 90px;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   padding: 14px 20px;
   background: var(--card);
   border: 1px solid var(--card-border);

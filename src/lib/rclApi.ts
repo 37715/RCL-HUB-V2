@@ -58,6 +58,8 @@ export interface PlayerHistoryMatch {
   teammates: string[]
   playedPct: number  // 0-100
   alivePct: number   // 0-100
+  lobbyAvgElo: number    // average entryRating of all players in the match (0 if unknown)
+  lobbyPlayerCount: number // total players in the match
 }
 
 export interface PlayerProfileData {
@@ -445,6 +447,15 @@ export async function getPlayerHistory(
     const playedPct = Math.round((rawPlayed <= 1 ? rawPlayed * 100 : rawPlayed))
     const alivePct  = Math.round((rawAlive  <= 1 ? rawAlive  * 100 : rawAlive))
 
+    // Lobby average ELO: mean of every player's entry rating in this match.
+    // This is the "strength of the lobby" at match start, per the upstream API.
+    const entryRatings = players
+      .map((p) => Number(p.entryRating ?? 0))
+      .filter((r) => r > 0)
+    const lobbyAvgElo = entryRatings.length > 0
+      ? Math.round(entryRatings.reduce((a, b) => a + b, 0) / entryRatings.length)
+      : 0
+
     matches.push({
       matchId: String(entry.id ?? entry._id ?? ''),
       date: String(entry.date ?? ''),
@@ -460,6 +471,8 @@ export async function getPlayerHistory(
       teammates,
       playedPct,
       alivePct,
+      lobbyAvgElo,
+      lobbyPlayerCount: players.length,
     })
   }
 

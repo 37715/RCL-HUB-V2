@@ -12,6 +12,8 @@ const NAV_LINKS = [
   { label: 'Mazing', href: '/mazing' },
 ]
 
+const FEATURED_LINK = { label: 'Tronnies', href: '/tronnies' }
+
 export default function Nav() {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -52,6 +54,13 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href={FEATURED_LINK.href}
+            className={`${styles.link} ${styles.featured} ${pathname.startsWith(FEATURED_LINK.href) ? styles.featuredActive : ''}`}
+          >
+            <span className={styles.featuredDot} />
+            {FEATURED_LINK.label}
+          </Link>
         </div>
 
         {/* Menu button — pushed right */}
