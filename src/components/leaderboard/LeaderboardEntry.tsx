@@ -11,6 +11,7 @@ interface Props {
   player: Player
   rank: number
   mode: GameMode
+  trapOverall?: boolean
   statsMode: StatsMode
   index: number
   onClick: () => void
@@ -57,13 +58,26 @@ function getFlagCode(username: string): string | null {
   return PLAYER_FLAGS[base] ?? null
 }
 
+function formatSeconds(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return '—'
+  return `${value.toFixed(3)}s`
+}
+
 function FlagIcon({ code, size = 28 }: { code: string; size?: number }) {
   const Component = (Flags as Record<string, React.ComponentType<{ style?: React.CSSProperties }>>)[code]
   if (!Component) return null
   return <Component style={{ width: size, height: 'auto', borderRadius: 2 }} />
 }
 
-export default function LeaderboardEntry({ player, rank, mode, statsMode, index, onClick }: Props) {
+export default function LeaderboardEntry({
+  player,
+  rank,
+  mode,
+  trapOverall = false,
+  statsMode,
+  index,
+  onClick,
+}: Props) {
   const flagCode = getFlagCode(player.username)
   const total   = player.matches || 1
   const winPct  = player.wins   / total * 100
@@ -72,6 +86,8 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
   const lossPct = player.losses / total * 100
 
   const isAdv     = statsMode === 'advanced'
+  const isTrap    = mode === 'trap-survival'
+  const isTrapOverall = isTrap && trapOverall
   const tierColor = TIER_COLORS[player.tier]
   const avatarBg  = hexRgba(tierColor, 0.14)
   const eloGlow   = `0 0 16px ${hexRgba(tierColor, 0.45)}`
@@ -101,6 +117,23 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
   const wrColor     = player.winRate >= 50 ? '#4eff91' : player.winRate >= 40 ? '#ffe94e' : '#ff3d6e'
   const deltaColor  = player.ratingDelta >= 0 ? '#4eff91' : '#ff3d6e'
   const avgPosColor = player.avgPosition <= 2 ? '#4eff91' : '#ff9a3c'
+  const trapBestSeconds = player.bestSurvivalSeconds ?? player.elo
+  const trapTargetSeconds = player.trapSurvivalTargetSeconds ?? null
+  const trapMarginSeconds =
+    player.trapMarginSeconds ??
+    (trapTargetSeconds == null ? null : trapBestSeconds - trapTargetSeconds)
+  const trapStatus = player.trapCleared ? 'CLEAR' : 'SURVIVED'
+  const trapStatusColor = player.trapCleared ? '#4eff91' : '#ff9a3c'
+  const trapMarginColor =
+    trapMarginSeconds == null
+      ? 'var(--muted)'
+      : trapMarginSeconds >= 0
+      ? '#4eff91'
+      : '#ff3d6e'
+  const trapOverallScore = player.trapOverallScore ?? player.avgScore
+  const trapMapsContributed = player.trapMapsContributed ?? 0
+  const trapOverallScoreColor =
+    trapOverallScore >= 75 ? '#4eff91' : trapOverallScore >= 60 ? '#ffe94e' : '#ff9a3c'
 
   const topClass = rank <= 3 ? (styles[`top${rank}` as keyof typeof styles] ?? '') : ''
 
@@ -135,16 +168,36 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
 
         {/* Col 3 — ELO */}
         <div className={styles.dc}>
-          <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 24, letterSpacing: 1, color: tierColor, textShadow: eloGlow }}>
-            {player.elo.toLocaleString()}
-          </span>
+          {isTrapOverall ? (
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 24, letterSpacing: 1, color: tierColor, textShadow: eloGlow }}>
+              {Math.round(player.elo)}
+            </span>
+          ) : isTrap ? (
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 24, letterSpacing: 1, color: tierColor, textShadow: eloGlow }}>
+              {formatSeconds(trapBestSeconds)}
+            </span>
+          ) : (
+            <span style={{ fontFamily: 'var(--font-bebas)', fontSize: 24, letterSpacing: 1, color: tierColor, textShadow: eloGlow }}>
+              {player.elo.toLocaleString()}
+            </span>
+          )}
         </div>
 
         {/* Col 4 — K/D */}
         <div className={styles.dc}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: player.kd > 0 ? kdColor : 'var(--muted)' }}>
-            {player.kd > 0 ? player.kd.toFixed(2) : '—'}
-          </span>
+          {isTrapOverall ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700, letterSpacing: 1.3, color: '#4ecdc4' }}>
+              {player.matches}
+            </span>
+          ) : isTrap ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700, letterSpacing: 1.2, color: '#4ecdc4' }}>
+              {player.matches}
+            </span>
+          ) : (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: player.kd > 0 ? kdColor : 'var(--muted)' }}>
+              {player.kd > 0 ? player.kd.toFixed(2) : '—'}
+            </span>
+          )}
         </div>
 
         {/* Col 5 — Last Active */}
@@ -156,22 +209,42 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
 
         {/* Col 6 — Matches */}
         <div className={styles.dc}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--muted)', letterSpacing: 1 }}>
-            {player.matches} matches
-          </span>
+          {isTrapOverall ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, color: trapOverallScoreColor, letterSpacing: 1, fontWeight: 700 }}>
+              {trapOverallScore.toFixed(1)}
+            </span>
+          ) : isTrap ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--muted)', letterSpacing: 1 }}>
+              {trapTargetSeconds == null ? '—' : formatSeconds(trapTargetSeconds)}
+            </span>
+          ) : (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--muted)', letterSpacing: 1 }}>
+              {player.matches} matches
+            </span>
+          )}
         </div>
 
         {/* Col 7 — Win Distribution */}
         <div className={styles.dc}>
-          <div className={styles.distWrap}>
-            <span className={styles.distPct}>{winPct.toFixed(0)}% WIN</span>
-            <div className={styles.distBar}>
-              <div style={{ width: `${winPct}%`,  background: '#4eff91', height: '100%' }} />
-              {mode !== '1v1' && <div style={{ width: `${secPct}%`,  background: '#ffe94e', height: '100%' }} />}
-              {mode !== '1v1' && <div style={{ width: `${thrPct}%`,  background: '#ff9a3c', height: '100%' }} />}
-              <div style={{ width: `${lossPct}%`, background: '#ff3d6e', height: '100%' }} />
+          {isTrapOverall ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700, color: 'var(--accent)', letterSpacing: 1 }}>
+              {formatSeconds(player.bestSurvivalSeconds)}
+            </span>
+          ) : isTrap ? (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color: trapMarginColor, letterSpacing: 1 }}>
+              {trapMarginSeconds == null ? '—' : `${trapMarginSeconds >= 0 ? '+' : ''}${formatSeconds(trapMarginSeconds)}`}
+            </span>
+          ) : (
+            <div className={styles.distWrap}>
+              <span className={styles.distPct}>{winPct.toFixed(0)}% WIN</span>
+              <div className={styles.distBar}>
+                <div style={{ width: `${winPct}%`,  background: '#4eff91', height: '100%' }} />
+                {mode !== '1v1' && <div style={{ width: `${secPct}%`,  background: '#ffe94e', height: '100%' }} />}
+                {mode !== '1v1' && <div style={{ width: `${thrPct}%`,  background: '#ff9a3c', height: '100%' }} />}
+                <div style={{ width: `${lossPct}%`, background: '#ff3d6e', height: '100%' }} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Col 8 — Tier */}
@@ -182,47 +255,73 @@ export default function LeaderboardEntry({ player, rank, mode, statsMode, index,
 
         {/* Mobile-only row 2: K/D · matches · last active */}
         <div className={styles.mobileRow2}>
-          <span style={{ color: player.kd > 0 ? kdColor : 'var(--muted)', fontWeight: 700 }}>
-            {player.kd > 0 ? player.kd.toFixed(2) : '—'} K/D
-          </span>
-          <span className={styles.mobileSep}>·</span>
-          <span>{player.matches} matches</span>
-          <span className={styles.mobileSep}>·</span>
-          <span>{player.lastActive}</span>
+          {isTrapOverall ? (
+            <>
+              <span style={{ color: '#4ecdc4', fontWeight: 700 }}>{player.matches} attempts</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{trapMapsContributed} maps</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>score {trapOverallScore.toFixed(1)}</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{player.lastActive}</span>
+            </>
+          ) : isTrap ? (
+            <>
+              <span style={{ color: trapStatusColor, fontWeight: 700 }}>{trapStatus}</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{player.matches} attempts</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>Target {trapTargetSeconds == null ? '—' : formatSeconds(trapTargetSeconds)}</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{player.lastActive}</span>
+            </>
+          ) : (
+            <>
+              <span style={{ color: player.kd > 0 ? kdColor : 'var(--muted)', fontWeight: 700 }}>
+                {player.kd > 0 ? player.kd.toFixed(2) : '—'} K/D
+              </span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{player.matches} matches</span>
+              <span className={styles.mobileSep}>·</span>
+              <span>{player.lastActive}</span>
+            </>
+          )}
         </div>
       </div>
 
       {/* ── Advanced sub-row (slides in below when advanced mode active) ── */}
-      <div className={`${styles.subRow} ${isAdv ? styles.subRowOpen : ''}`}>
-        <div className={styles.subRowInner}>
-          <div className={styles.subStat}>
-            <span className={styles.subLabel}>Win Rate</span>
-            <span className={styles.subValue} style={{ color: wrColor }}>{player.winRate.toFixed(1)}%</span>
-          </div>
-          <div className={styles.subDivider} />
-          <div className={styles.subStat}>
-            <span className={styles.subLabel}>Avg Position</span>
-            <span className={styles.subValue} style={{ color: avgPosColor }}>{player.avgPosition.toFixed(1)}</span>
-          </div>
-          <div className={styles.subDivider} />
-          <div className={styles.subStat}>
-            <span className={styles.subLabel}>Avg Score</span>
-            <span className={styles.subValue}>{player.avgScore.toLocaleString()}</span>
-          </div>
-          <div className={styles.subDivider} />
-          <div className={styles.subStat}>
-            <span className={styles.subLabel}>High Score</span>
-            <span className={styles.subValue} style={{ color: 'var(--accent)' }}>{player.highScore.toLocaleString()}</span>
-          </div>
-          <div className={styles.subDivider} />
-          <div className={styles.subStat}>
-            <span className={styles.subLabel}>Rating Δ</span>
-            <span className={styles.subValue} style={{ color: deltaColor }}>
-              {player.ratingDelta >= 0 ? '+' : ''}{player.ratingDelta}
-            </span>
+      {!isTrap && (
+        <div className={`${styles.subRow} ${isAdv ? styles.subRowOpen : ''}`}>
+          <div className={styles.subRowInner}>
+            <div className={styles.subStat}>
+              <span className={styles.subLabel}>Win Rate</span>
+              <span className={styles.subValue} style={{ color: wrColor }}>{player.winRate.toFixed(1)}%</span>
+            </div>
+            <div className={styles.subDivider} />
+            <div className={styles.subStat}>
+              <span className={styles.subLabel}>Avg Position</span>
+              <span className={styles.subValue} style={{ color: avgPosColor }}>{player.avgPosition.toFixed(1)}</span>
+            </div>
+            <div className={styles.subDivider} />
+            <div className={styles.subStat}>
+              <span className={styles.subLabel}>Avg Score</span>
+              <span className={styles.subValue}>{player.avgScore.toLocaleString()}</span>
+            </div>
+            <div className={styles.subDivider} />
+            <div className={styles.subStat}>
+              <span className={styles.subLabel}>High Score</span>
+              <span className={styles.subValue} style={{ color: 'var(--accent)' }}>{player.highScore.toLocaleString()}</span>
+            </div>
+            <div className={styles.subDivider} />
+            <div className={styles.subStat}>
+              <span className={styles.subLabel}>Rating Δ</span>
+              <span className={styles.subValue} style={{ color: deltaColor }}>
+                {player.ratingDelta >= 0 ? '+' : ''}{player.ratingDelta}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

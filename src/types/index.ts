@@ -1,4 +1,4 @@
-export type GameMode = 'tst' | '1v1' | 'sumobar' | 'fortress'
+export type GameMode = 'tst' | '1v1' | 'sumobar' | 'fortress' | 'trap-survival'
 export type Season = 1 | 2 | 3 | 4
 export type Region = 'eu' | 'na' | 'combined'
 export type TimePeriod = 'all' | 'weekly'
@@ -26,6 +26,13 @@ export interface Player {
   avgScore: number
   highScore: number
   ratingDelta: number
+  bestSurvivalSeconds?: number
+  trapCleared?: boolean
+  trapSurvivalTargetSeconds?: number | null
+  trapMarginSeconds?: number | null
+  trapOverall?: boolean
+  trapOverallScore?: number
+  trapMapsContributed?: number
 }
 
 export interface MazeDifficulty {

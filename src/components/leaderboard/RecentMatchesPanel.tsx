@@ -123,18 +123,40 @@ function TeamCard({ team, isWinner, playerLookup }: {
 export default function RecentMatchesPanel({ players, isOpen, onClose }: Props) {
   const [matches, setMatches] = useState<RecentMatch[]>([])
   const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasNext, setHasNext] = useState(false)
 
   const playerLookup = new Map(players.map((p) => [p.username.toLowerCase(), p.tier]))
 
   useEffect(() => {
     if (!isOpen) return
-    setMatches([])
-    setLoading(true)
-    fetch('/api/matches/recent')
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => { setMatches(Array.isArray(data) ? data : []); setLoading(false) })
-      .catch(() => setLoading(false))
+    setPage(1)
   }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const limit = 10
+    const ac = new AbortController()
+    setMatches([])
+    setHasNext(false)
+    setLoading(true)
+
+    fetch(`/api/matches/recent?page=${page}&limit=${limit}`, { signal: ac.signal })
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => {
+        const list = Array.isArray(data) ? (data as RecentMatch[]) : []
+        setMatches(list)
+        // We don't have total count; infer "next page exists" if we got a full page.
+        setHasNext(list.length >= limit)
+        setLoading(false)
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError') return
+        setLoading(false)
+      })
+
+    return () => ac.abort()
+  }, [isOpen, page])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -165,11 +187,30 @@ export default function RecentMatchesPanel({ players, isOpen, onClose }: Props) 
             <div className={styles.header}>
               <div className={styles.headerLeft}>
                 <span className={styles.title}>Recent Matches</span>
-                {!loading && matches.length > 0 && (
-                  <span className={styles.meta}>{matches.length} matches</span>
-                )}
+                <span className={styles.meta}>page {page}</span>
+                {!loading && matches.length > 0 && <span className={styles.meta}>{matches.length} matches</span>}
               </div>
-              <button className={styles.closeBtn} onClick={onClose}>✕</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button
+                  className={styles.closeBtn}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={loading || page <= 1}
+                  aria-label="Previous page"
+                  title="Previous page"
+                >
+                  ‹
+                </button>
+                <button
+                  className={styles.closeBtn}
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={loading || !hasNext}
+                  aria-label="Next page"
+                  title={hasNext ? 'Next page' : 'No more matches'}
+                >
+                  ›
+                </button>
+                <button className={styles.closeBtn} onClick={onClose}>✕</button>
+              </div>
             </div>
 
             <div className={styles.body}>

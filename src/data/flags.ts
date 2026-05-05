@@ -29,6 +29,8 @@ export const PLAYER_FLAGS: Record<string, string | null> = {
   'm3lon':        'GB',
   'm3l0n':        'GB',
   'nanu':         'US',
+  'nanu_nanu':    'US',
+  'nanu\\_nanu':  'US',
   'doov':         'US',
   'cookie':       'US',
   'tatty':        'US',
@@ -74,4 +76,6 @@ export const PLAYER_FLAGS: Record<string, string | null> = {
   'froggy':       'US',
   'envii':        'US',
   'drunk duck':   'SK',
+  'ilona':        'UA',
+  'teen':         'US',
 }

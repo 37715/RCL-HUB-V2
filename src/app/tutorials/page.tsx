@@ -96,6 +96,19 @@ camera_glance_back_fromspeed 0
 zone_height .5
 zone_alpha .17`,
   },
+  {
+    name: 'Kronkleberry',
+    image: '/assets/campreviews/kronkleberry.png',
+    config: `# Kronkleberry
+camera_custom_rise 18
+camera_custom_back 18
+camera_custom_pitch -.7
+camera_glance_rise 18
+camera_glance_back 18
+camera_glance_pitch -.7
+camera_custom_turn_speed 4.5
+zone_height .3`,
+  },
 ]
 
 const inlineStyles: Record<string, React.CSSProperties> = {

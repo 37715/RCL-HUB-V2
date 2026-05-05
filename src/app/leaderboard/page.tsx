@@ -3,10 +3,12 @@ import LeaderboardClient from '@/components/leaderboard/LeaderboardClient'
 
 export const metadata: Metadata = {
   title: 'Leaderboard',
-  description: 'Live ELO rankings across all RCL game modes — TST, Sumobar, Fortress, and 1v1. Filter by region, season, and time period.',
+  description:
+    'Live RCL leaderboards across TST, Sumobar, Fortress, 1v1, and Trap Survival. Filter by mode, season, and map.',
   openGraph: {
     title: 'RCL Leaderboard',
-    description: 'Live ELO rankings across all RCL game modes — TST, Sumobar, Fortress, and 1v1.',
+    description:
+      'Live RCL leaderboards across TST, Sumobar, Fortress, 1v1, and Trap Survival.',
   },
 }
 

@@ -311,6 +311,15 @@ function parseRankingsHtml(html: string, minMatches: number): LeaderboardRow[] {
 // Public API functions
 // ---------------------------------------------------------------------------
 
+/** TST list/details live here; avoid retrocyclesleague.com when that host is down. */
+const DEFAULT_TST_MATCH_HISTORY_BASE = 'http://tron.bwildprod.com:6578/api/MatchHistory'
+
+function tstMatchHistoryBaseUrl(): string {
+  const fromEnv = process.env.RCL_TST_MATCH_HISTORY_BASE_URL?.trim()
+  if (fromEnv) return fromEnv.replace(/\/$/, '')
+  return DEFAULT_TST_MATCH_HISTORY_BASE
+}
+
 export async function getLeaderboardRows(
   season: UiSeason,
   region: UiRegion,
@@ -358,6 +367,25 @@ export async function getMatchHistory(
   mode: 'tst' | 'sbt' = 'tst',
   page = 1,
 ): Promise<MatchSummary[]> {
+  if (mode === 'tst') {
+    const url = `${tstMatchHistoryBaseUrl()}/GetTstMatches?page=${page}`
+    const res = await fetch(url, { next: { revalidate: 120 } })
+    if (!res.ok) throw new Error(`Match history fetch failed: ${res.status}`)
+    const data = await res.json()
+    const list: Record<string, unknown>[] = Array.isArray(data)
+      ? data
+      : ((data.matches ?? data.data ?? []) as Record<string, unknown>[])
+    return list.map((m) => ({
+      id: String(m.id ?? ''),
+      date: String(m.date ?? ''),
+      roundCount: Number(m.roundCount ?? 0),
+      totalTimeSeconds: Number(m.totalTimeSeconds ?? m.totalTime ?? 0),
+      winner: String(m.winner ?? ''),
+      server: m.server ? String(m.server) : undefined,
+      region: m.region ? String(m.region) : undefined,
+    }))
+  }
+
   const url = `https://retrocyclesleague.com/api/history/${mode}?page=${page}`
   const res = await fetch(url, { next: { revalidate: 120 } })
   if (!res.ok) throw new Error(`Match history fetch failed: ${res.status}`)
@@ -377,7 +405,7 @@ export async function getMatchHistory(
 }
 
 export async function getMatchDetails(matchId: string): Promise<Record<string, unknown> | null> {
-  const url = `https://retrocyclesleague.com/api/history/tst?id=${encodeURIComponent(matchId)}`
+  const url = `${tstMatchHistoryBaseUrl()}/GetTstMatchDetails?id=${encodeURIComponent(matchId)}`
   const res = await fetch(url, { next: { revalidate: 3600 } })
   if (!res.ok) return null
   return res.json()
@@ -507,10 +535,15 @@ export interface RecentMatch {
   teams: RecentMatchTeam[]
 }
 
-export async function getRecentMatches(): Promise<RecentMatch[]> {
-  // Step 1: fetch match list from the correct RCL API
-  const summaries = await getMatchHistory('tst', 1)
-  const recent = summaries.slice(0, 20)
+export async function getRecentMatches(opts?: {
+  page?: number
+  limit?: number
+}): Promise<RecentMatch[]> {
+  const page = Math.max(1, Math.floor(opts?.page ?? 1))
+  const limit = Math.min(25, Math.max(1, Math.floor(opts?.limit ?? 20)))
+
+  const summaries = await getMatchHistory('tst', page)
+  const recent = summaries.slice(0, limit)
 
   // Step 2: fetch full details for each match in parallel
   const details = await Promise.all(recent.map((s) => getMatchDetails(s.id)))

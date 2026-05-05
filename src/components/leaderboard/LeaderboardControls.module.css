@@ -111,6 +111,34 @@
   overflow: hidden;
 }
 
+.selectWrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--card-border);
+  min-width: 320px;
+  padding: 0 10px;
+}
+
+.select {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font-barlow), 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.select option {
+  background: #0a0a0a;
+  color: var(--text);
+}
+
 /* Filter buttons — enlarged, solid fill hover, text stays visible via z-index */
 .filterBtn {
   position: relative;
@@ -331,6 +359,16 @@
     padding: 7px 12px;
     font-size: 11px;
     letter-spacing: 1.5px;
+  }
+
+  .selectWrap {
+    min-width: 240px;
+  }
+
+  .select {
+    height: 34px;
+    font-size: 11px;
+    letter-spacing: 1px;
   }
 
   /* Records + Advanced Stats: side-by-side row */

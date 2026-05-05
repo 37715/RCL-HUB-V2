@@ -18,9 +18,35 @@ const GAME_MODE_TITLES: Record<GameMode, [string, string]> = {
   '1v1': ['One vs', 'One'],
   sumobar: ['Sumo', 'Bar'],
   fortress: ['Fortress', 'Mode'],
+  'trap-survival': ['Trap', 'Survival'],
 }
 
-const LIVE_MODES: GameMode[] = ['tst']
+const LIVE_MODES: GameMode[] = ['tst', 'trap-survival']
+const OVERALL_MAP_SENTINEL = '__overall__'
+
+type TrapDifficultyValue = 'all' | 'basic' | 'intermediate' | 'advanced' | 'expert' | 'demon'
+
+type TrapDifficultyOption = {
+  value: TrapDifficultyValue
+  label: string
+  mapCount: number
+}
+
+type TrapMapOption = {
+  mapResource: string
+  mapName: string
+  survivalTargetSeconds: number | null
+  runCount: number
+}
+
+type TrapLeaderboardPayload = {
+  selectedDifficulty: TrapDifficultyValue
+  selectedMapResource: string
+  selectedMapName: string | null
+  difficulties: TrapDifficultyOption[]
+  maps: TrapMapOption[]
+  players: Player[]
+}
 
 export default function LeaderboardClient() {
   const [gameMode, setGameMode] = useState<GameMode>('tst')
@@ -39,10 +65,16 @@ export default function LeaderboardClient() {
   const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [trapDifficulty, setTrapDifficulty] = useState<TrapDifficultyValue>('all')
+  const [trapMapResource, setTrapMapResource] = useState(OVERALL_MAP_SENTINEL)
+  const [trapMapName, setTrapMapName] = useState<string | null>(null)
+  const [trapDifficultyOptions, setTrapDifficultyOptions] = useState<TrapDifficultyOption[]>([])
+  const [trapMapOptions, setTrapMapOptions] = useState<TrapMapOption[]>([])
 
   // Incremented on every new fetch so stale KD callbacks are discarded
   const fetchGen = useRef(0)
 
+  const isTrapMode = gameMode === 'trap-survival'
   const isLive = LIVE_MODES.includes(gameMode)
 
   const fetchPlayers = useCallback(async () => {
@@ -55,6 +87,37 @@ export default function LeaderboardClient() {
     setLoading(true)
     setError(null)
     try {
+      if (isTrapMode) {
+        const trapParams = new URLSearchParams()
+        trapParams.set('difficulty', trapDifficulty)
+        if (trapMapResource) trapParams.set('mapResource', trapMapResource)
+
+        const trapRes = await fetch(`/api/leaderboard/trap?${trapParams}`)
+        if (!trapRes.ok) throw new Error(`HTTP ${trapRes.status}`)
+        const trapPayload = (await trapRes.json()) as TrapLeaderboardPayload
+        if (gen !== fetchGen.current) return
+
+        setPlayers(Array.isArray(trapPayload.players) ? trapPayload.players : [])
+        setTrapDifficultyOptions(
+          Array.isArray(trapPayload.difficulties) ? trapPayload.difficulties : []
+        )
+        setTrapMapOptions(Array.isArray(trapPayload.maps) ? trapPayload.maps : [])
+        setTrapMapName(
+          trapPayload.selectedMapName && trapPayload.selectedMapName.trim()
+            ? trapPayload.selectedMapName
+            : null
+        )
+        if (trapPayload.selectedDifficulty) {
+          setTrapDifficulty((prev) =>
+            prev === trapPayload.selectedDifficulty ? prev : trapPayload.selectedDifficulty
+          )
+        }
+        setTrapMapResource((prev) =>
+          prev === trapPayload.selectedMapResource ? prev : trapPayload.selectedMapResource
+        )
+        return
+      }
+
       const params = new URLSearchParams({
         mode: gameMode,
         season: String(season),
@@ -69,12 +132,12 @@ export default function LeaderboardClient() {
       setPlayers(list)
     } catch {
       if (gen !== fetchGen.current) return
-      setError('Failed to load leaderboard data.')
+      setError(isTrapMode ? 'Failed to load trap survival leaderboard.' : 'Failed to load leaderboard data.')
       setPlayers([])
     } finally {
       if (gen === fetchGen.current) setLoading(false)
     }
-  }, [gameMode, season, region, period, isLive])
+  }, [gameMode, season, region, period, isLive, isTrapMode, trapDifficulty, trapMapResource])
 
   useEffect(() => {
     fetchPlayers()
@@ -103,12 +166,14 @@ export default function LeaderboardClient() {
   const displayedPlayers = useMemo(() => {
     return [...players].sort((a, b) => {
       const dir = sortDir === 'desc' ? -1 : 1
-      const av = a[sortBy] as number
-      const bv = b[sortBy] as number
+      const av = Number(a[sortBy] as number) || 0
+      const bv = Number(b[sortBy] as number) || 0
       if (sortBy === 'avgPosition') return dir * (bv - av)
       return dir * (av - bv)
     })
   }, [players, sortBy, sortDir])
+
+  const trapOverallSelected = isTrapMode && trapMapResource === OVERALL_MAP_SENTINEL
 
   const [titleLine1, titleLine2] = GAME_MODE_TITLES[gameMode]
 
@@ -145,10 +210,12 @@ export default function LeaderboardClient() {
 
           {isLive && (
             <div className={styles.heroRight}>
-              <span className={styles.seasonBadge}>S{season} {SEASON_YEARS[season]}</span>
+              {!isTrapMode && <span className={styles.seasonBadge}>S{season} {SEASON_YEARS[season]}</span>}
+              {isTrapMode && <span className={styles.seasonBadge}>{trapOverallSelected ? 'RATING' : 'MAP'}</span>}
               <span className={styles.activePlayers}>
                 {loading ? '…' : `${displayedPlayers.length}`} Players
               </span>
+              {isTrapMode && trapMapName && <span className={styles.activePlayers}>{trapMapName}</span>}
             </div>
           )}
         </div>
@@ -163,13 +230,30 @@ export default function LeaderboardClient() {
         statsMode={statsMode}
         matchHistoryOpen={matchHistoryOpen}
         recordsOpen={recordsOpen}
-        onGameModeChange={(m) => { setGameMode(m); setSortBy('elo'); setSortDir('desc') }}
+        onGameModeChange={(m) => {
+          setGameMode(m)
+          setSortBy('elo')
+          setSortDir('desc')
+          if (m === 'trap-survival') {
+            setStatsMode('simple')
+            setTrapMapResource(OVERALL_MAP_SENTINEL)
+          }
+        }}
         onSeasonChange={(s) => { setSeason(s); if (period === 'weekly') setPeriod('all') }}
         onRegionChange={setRegion}
         onPeriodChange={setPeriod}
         onStatsModeToggle={() => setStatsMode((prev) => (prev === 'simple' ? 'advanced' : 'simple'))}
         onMatchHistoryOpen={() => setMatchHistoryOpen(true)}
         onRecordsOpen={() => setRecordsOpen(true)}
+        trapDifficulty={trapDifficulty}
+        trapMapResource={trapMapResource}
+        trapDifficultyOptions={trapDifficultyOptions}
+        trapMapOptions={trapMapOptions}
+        onTrapDifficultyChange={(difficulty) => {
+          setTrapDifficulty(difficulty as TrapDifficultyValue)
+          setTrapMapResource(OVERALL_MAP_SENTINEL)
+        }}
+        onTrapMapChange={setTrapMapResource}
       />
 
       {/* Table */}
@@ -194,8 +278,11 @@ export default function LeaderboardClient() {
             statsMode={statsMode}
             sortBy={sortBy}
             sortDir={sortDir}
+            trapOverall={trapOverallSelected}
             onSort={handleSort}
-            onPlayerClick={handlePlayerClick}
+            onPlayerClick={(player) => {
+              if (!isTrapMode) handlePlayerClick(player)
+            }}
           />
         )}
       </div>

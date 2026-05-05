@@ -11,6 +11,7 @@ interface Props {
   statsMode: StatsMode
   sortBy: SortKey
   sortDir: SortDir
+  trapOverall?: boolean
   onSort: (key: SortKey) => void
   onPlayerClick: (player: Player) => void
 }
@@ -42,7 +43,38 @@ const ADV_COLS: ColDef[] = [
   { label: 'RANK' },
 ]
 
-export default function LeaderboardTable({ players, mode, statsMode, sortBy, sortDir, onSort, onPlayerClick }: Props) {
+const TRAP_COLS: ColDef[] = [
+  { label: '#' },
+  { label: 'PLAYER' },
+  { label: 'BEST TIME', sortKey: 'elo' },
+  { label: 'ATTEMPTS', sortKey: 'matches' },
+  { label: 'LAST RUN' },
+  { label: 'TARGET' },
+  { label: 'MARGIN' },
+  { label: 'RANK' },
+]
+
+const TRAP_OVERALL_COLS: ColDef[] = [
+  { label: '#' },
+  { label: 'PLAYER' },
+  { label: 'RATING', sortKey: 'elo' },
+  { label: 'ATTEMPTS', sortKey: 'matches' },
+  { label: 'LAST RUN' },
+  { label: 'AVG SCORE' },
+  { label: 'BEST TIME' },
+  { label: 'RANK' },
+]
+
+export default function LeaderboardTable({
+  players,
+  mode,
+  statsMode,
+  sortBy,
+  sortDir,
+  trapOverall = false,
+  onSort,
+  onPlayerClick,
+}: Props) {
   const [scanning, setScanning] = useState(false)
   const [headerKey, setHeaderKey] = useState(0)
   const prevMode = useRef(statsMode)
@@ -57,7 +89,8 @@ export default function LeaderboardTable({ players, mode, statsMode, sortBy, sor
     }
   }, [statsMode])
 
-  const cols = SIMPLE_COLS
+  const cols =
+    mode === 'trap-survival' ? (trapOverall ? TRAP_OVERALL_COLS : TRAP_COLS) : SIMPLE_COLS
 
   return (
     <div className={styles.wrap}>
@@ -91,6 +124,7 @@ export default function LeaderboardTable({ players, mode, statsMode, sortBy, sor
             player={player}
             rank={index + 1}
             mode={mode}
+            trapOverall={trapOverall}
             statsMode={statsMode}
             index={index}
             onClick={() => onPlayerClick(player)}
