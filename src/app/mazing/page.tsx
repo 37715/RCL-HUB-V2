@@ -19,6 +19,58 @@ function formatTime(s: number): string {
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
 
+const PLAYBACK_RATES = [0.25, 0.5, 1, 1.5, 2] as const
+
+function formatRate(r: number): string {
+  return Number.isInteger(r) ? `${r}x` : `${r}x`
+}
+
+function SpeedControl({
+  videoRef,
+  color,
+}: {
+  videoRef: React.RefObject<HTMLVideoElement>
+  color: string
+}) {
+  const [rate, setRate] = useState<number>(1)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const v = videoRef.current
+    if (v) v.playbackRate = rate
+  }, [rate, videoRef])
+
+  return (
+    <div className={styles.speedWrap}>
+      <button
+        className={styles.speedBtn}
+        onClick={() => setOpen((o) => !o)}
+        title="Playback speed"
+        style={rate !== 1 ? { color } : undefined}
+      >
+        {formatRate(rate)}
+      </button>
+      {open && (
+        <div className={styles.speedMenu} onMouseLeave={() => setOpen(false)}>
+          {PLAYBACK_RATES.map((r) => (
+            <button
+              key={r}
+              className={`${styles.speedOption} ${r === rate ? styles.speedOptionActive : ''}`}
+              style={r === rate ? { color, borderColor: `${color}55` } : undefined}
+              onClick={() => {
+                setRate(r)
+                setOpen(false)
+              }}
+            >
+              {formatRate(r)}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function MazeModal({ maze, onClose }: { maze: SelectedMaze; onClose: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [playing, setPlaying] = useState(false)
@@ -100,6 +152,7 @@ function MazeModal({ maze, onClose }: { maze: SelectedMaze; onClose: () => void 
             onMouseUp={() => setSeeking(false)}
           />
           <span className={styles.timeLabel}>{formatTime(duration)}</span>
+          <SpeedControl videoRef={videoRef} color={maze.difficulty.color} />
           <button className={styles.ctrlBtn} title="Fullscreen"
             onClick={() => { if (videoRef.current?.requestFullscreen) videoRef.current.requestFullscreen() }}>
             ⛶
@@ -197,6 +250,7 @@ function CommunityMazeModal({ maze, onClose }: { maze: CommunityMaze; onClose: (
             onMouseUp={() => setSeeking(false)}
           />
           <span className={styles.timeLabel}>{formatTime(duration)}</span>
+          <SpeedControl videoRef={videoRef} color={maze.difficultyColor} />
           <button className={styles.ctrlBtn} title="Fullscreen"
             onClick={() => { if (videoRef.current?.requestFullscreen) videoRef.current.requestFullscreen() }}>
             ⛶

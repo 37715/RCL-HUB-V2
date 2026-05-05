@@ -482,6 +482,60 @@
   cursor: pointer;
 }
 
+/* ── Playback speed ── */
+.speedWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.speedBtn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+  min-width: 38px;
+  text-align: center;
+}
+.speedBtn:hover { opacity: 1; border-color: rgba(255,255,255,0.25); }
+
+.speedMenu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15,15,15,0.98);
+  border: 1px solid var(--card-border);
+  padding: 4px;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.speedOption {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.12s, background 0.12s;
+}
+.speedOption:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+.speedOptionActive {
+  background: rgba(255,255,255,0.05);
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .hero       { padding: 56px 32px 36px; }
