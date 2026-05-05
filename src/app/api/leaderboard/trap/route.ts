@@ -41,10 +41,20 @@ type AttemptRow = {
   latestRunAt?: string | null
 }
 
-function recordsBaseUrl(): string {
-  const raw =
-    process.env.RCL_TRAP_SURVIVAL_RECORDS_BASE_URL?.trim() || 'https://retrocyclesleague.com'
-  return raw.replace(/\/$/, '')
+/**
+ * Trap run rows live in the **rcl-dashboard** Postgres, served at `GET /api/trap-survival/records`.
+ * On the UK prod host, outbound HTTPS to `retrocyclesleague.com` often fails (connection refused),
+ * so we try local blue/green dashboard ports before the public URL. Override with
+ * `RCL_TRAP_SURVIVAL_RECORDS_BASE_URL` when the hub runs off-box.
+ */
+function trapRecordsBaseCandidates(): string[] {
+  const fromEnv = process.env.RCL_TRAP_SURVIVAL_RECORDS_BASE_URL?.trim()
+  if (fromEnv) return [fromEnv.replace(/\/$/, '')]
+  return [
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
+    'https://retrocyclesleague.com',
+  ]
 }
 
 function normalizeTier(label: string | null | undefined): TrapTier | null {
@@ -96,11 +106,22 @@ function emptyPayload(
 }
 
 async function fetchTrapJson(query: string): Promise<Record<string, unknown>> {
-  const url = `${recordsBaseUrl()}/api/trap-survival/records?authOnly=true&${query}`
-  const res = await fetch(url, { next: { revalidate: 45 } })
-  if (!res.ok) throw new Error(`trap records ${res.status}`)
-  const json = (await res.json()) as Record<string, unknown>
-  return json
+  const bases = trapRecordsBaseCandidates()
+  let lastErr: Error | null = null
+  for (const base of bases) {
+    const url = `${base}/api/trap-survival/records?authOnly=true&${query}`
+    try {
+      const res = await fetch(url, { next: { revalidate: 45 } })
+      if (!res.ok) {
+        lastErr = new Error(`trap records ${res.status} from ${base}`)
+        continue
+      }
+      return (await res.json()) as Record<string, unknown>
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e))
+    }
+  }
+  throw lastErr ?? new Error('trap records: no reachable upstream')
 }
 
 function readRecentMaps(json: Record<string, unknown>): MapSummary[] {
